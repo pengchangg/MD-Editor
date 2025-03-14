@@ -9,7 +9,7 @@
     <!-- 引入 Split.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
     <!-- 引入 marked.js -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@5.1.2/marked.min.js"></script>
     <!-- 引入 highlight.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" id="code-theme">
@@ -19,6 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- 引入自定义样式 -->
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/modal.css">
 </head>
 <body class="light-theme">
     <div class="toolbar">
@@ -33,6 +34,7 @@
         <button id="code-btn" title="代码块"><i class="fas fa-code"></i></button>
         <button id="table-btn" title="表格"><i class="fas fa-table"></i></button>
         <div class="spacer"></div>
+        <button id="help-btn" title="快捷键帮助"><i class="fas fa-keyboard"></i></button>
         <button id="undo-btn" title="撤销 (Ctrl+Z)"><i class="fas fa-undo"></i></button>
         <button id="redo-btn" title="重做 (Ctrl+Y)"><i class="fas fa-redo"></i></button>
         <div class="dropdown">
@@ -64,6 +66,41 @@
     </div>
 
     <div id="notification" class="notification"></div>
+
+    <!-- 快捷键帮助对话框 -->
+    <div id="shortcut-help" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Markdown 编辑器快捷键</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>快捷键</th>
+                        <th>功能</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ctrl+B</td><td>粗体</td></tr>
+                    <tr><td>Ctrl+I</td><td>斜体</td></tr>
+                    <tr><td>Ctrl+K</td><td>链接</td></tr>
+                    <tr><td>Ctrl+Shift+I</td><td>图片</td></tr>
+                    <tr><td>Ctrl+`</td><td>行内代码</td></tr>
+                    <tr><td>Ctrl+Shift+C</td><td>代码块</td></tr>
+                    <tr><td>Ctrl+Shift+B</td><td>引用块</td></tr>
+                    <tr><td>Ctrl+Shift+L</td><td>无序列表</td></tr>
+                    <tr><td>Ctrl+Shift+O</td><td>有序列表</td></tr>
+                    <tr><td>Ctrl+Shift+T</td><td>表格</td></tr>
+                    <tr><td>Ctrl+1 到 Ctrl+6</td><td>标题 1-6</td></tr>
+                    <tr><td>Ctrl+Shift+X</td><td>删除线</td></tr>
+                    <tr><td>Ctrl+Shift+H</td><td>水平分割线</td></tr>
+                    <tr><td>Ctrl+Shift+K</td><td>任务列表</td></tr>
+                    <tr><td>Ctrl+S</td><td>保存</td></tr>
+                    <tr><td>Ctrl+Z</td><td>撤销</td></tr>
+                    <tr><td>Ctrl+Y 或 Ctrl+Shift+Z</td><td>重做</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <!-- 引入自定义脚本 -->
     <script src="js/index.js"></script>

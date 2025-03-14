@@ -17,18 +17,20 @@ body {
     overflow: hidden;
     font-family: 'LXGW WenKai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    flex-direction: column;
 }
 
 /* 亮色主题 */
 body.light-theme {
     background-color: #ffffff;
-    color: #333333;
+    color: #24292e;
 }
 
 /* 暗色主题 */
 body.dark-theme {
-    background-color: #1e1e1e;
-    color: #e0e0e0;
+    background-color: #0d1117;
+    color: #c9d1d9;
 }
 
 .toolbar {
@@ -37,6 +39,7 @@ body.dark-theme {
     background-color: #f0f0f0;
     border-bottom: 1px solid #ddd;
     transition: background-color 0.3s;
+    z-index: 10;
 }
 
 body.dark-theme .toolbar {
@@ -122,12 +125,14 @@ body.dark-theme .dropdown-content button:hover {
 .container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 50px);
+    flex: 1;
+    overflow: hidden;
 }
 
 .content {
     display: flex;
-    flex-grow: 1;
+    flex: 1;
+    overflow: hidden;
 }
 
 .editor, .preview {
@@ -135,6 +140,8 @@ body.dark-theme .dropdown-content button:hover {
     padding: 20px;
     height: 100%;
     transition: background-color 0.3s;
+    scroll-behavior: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .editor {
@@ -210,6 +217,8 @@ body.dark-theme .line-numbers .active-line {
     font-size: 12px;
     color: #666;
     transition: background-color 0.3s;
+    z-index: 10;
+    flex-shrink: 0;
 }
 
 body.dark-theme .status-bar {
@@ -237,61 +246,80 @@ body.dark-theme .status-bar {
     opacity: 1;
 }
 
+/* GitHub 风格的预览区域 */
 .preview {
     background: white;
     border-left: 1px solid #ddd;
     font-family: 'LXGW WenKai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.5;
+    color: #24292e;
+    font-size: 16px;
+    padding: 32px;
 }
 
 body.dark-theme .preview {
-    background: #1e1e1e;
-    border-left: 1px solid #444;
-}
-
-.gutter {
-    background-color: #eee;
-    background-repeat: no-repeat;
-    background-position: 50%;
-    cursor: col-resize;
-    transition: background-color 0.3s;
-}
-
-body.dark-theme .gutter {
-    background-color: #333;
-}
-
-.gutter.gutter-horizontal {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
-}
-
-/* 暗色主题下的预览样式 */
-body.dark-theme .preview {
-    color: #e0e0e0;
-}
-
-body.dark-theme .preview a {
-    color: #61afef;
-}
-
-body.dark-theme .preview h1,
-body.dark-theme .preview h2,
-body.dark-theme .preview h3,
-body.dark-theme .preview h4,
-body.dark-theme .preview h5,
-body.dark-theme .preview h6 {
-    color: #e0e0e0;
-}
-
-body.dark-theme .preview blockquote {
-    border-left: 4px solid #444;
-    background-color: #2d2d2d;
+    background: #0d1117;
+    border-left: 1px solid #30363d;
+    color: #c9d1d9;
 }
 
 /* 预览区域的样式 */
-.preview h1, .preview h2 {
-    border-bottom: 1px solid #eaecef;
-    padding-bottom: 0.3em;
+.preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 {
+    margin-top: 24px;
     margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.preview h1 {
+    font-size: 2em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #eaecef;
+}
+
+.preview h2 {
+    font-size: 1.5em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #eaecef;
+}
+
+.preview h3 {
+    font-size: 1.25em;
+}
+
+.preview h4 {
+    font-size: 1em;
+}
+
+.preview h5 {
+    font-size: 0.875em;
+}
+
+.preview h6 {
+    font-size: 0.85em;
+    color: #6a737d;
+}
+
+body.dark-theme .preview h6 {
+    color: #8b949e;
+}
+
+.preview p {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.preview a {
+    color: #0366d6;
+    text-decoration: none;
+}
+
+body.dark-theme .preview a {
+    color: #58a6ff;
+}
+
+.preview a:hover {
+    text-decoration: underline;
 }
 
 .preview blockquote {
@@ -301,16 +329,38 @@ body.dark-theme .preview blockquote {
     margin: 0 0 16px 0;
 }
 
-.preview pre {
-    background-color: #f6f8fa;
-    border-radius: 3px;
-    padding: 16px;
-    overflow: auto;
+body.dark-theme .preview blockquote {
+    color: #8b949e;
+    border-left: 0.25em solid #30363d;
+}
+
+.preview ul, .preview ol {
+    padding-left: 2em;
+    margin-top: 0;
     margin-bottom: 16px;
 }
 
+.preview li {
+    margin-top: 0.25em;
+}
+
+.preview li + li {
+    margin-top: 0.25em;
+}
+
+.preview pre {
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    padding: 16px;
+    overflow: auto;
+    margin-bottom: 16px;
+    font-family: 'LXGW WenKai', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 85%;
+    line-height: 1.45;
+}
+
 body.dark-theme .preview pre {
-    background-color: #282c34;
+    background-color: #161b22;
 }
 
 .preview code {
@@ -323,12 +373,16 @@ body.dark-theme .preview pre {
 }
 
 body.dark-theme .preview code {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(110, 118, 129, 0.4);
 }
 
 .preview pre code {
     padding: 0;
+    margin: 0;
     background-color: transparent;
+    border: 0;
+    word-break: normal;
+    white-space: pre;
 }
 
 /* 表格样式 */
@@ -336,6 +390,9 @@ body.dark-theme .preview code {
     border-collapse: collapse;
     width: 100%;
     margin-bottom: 16px;
+    display: block;
+    width: 100%;
+    overflow: auto;
 }
 
 .preview table th,
@@ -349,40 +406,83 @@ body.dark-theme .preview code {
     font-weight: 600;
 }
 
+.preview table tr {
+    background-color: #ffffff;
+    border-top: 1px solid #c6cbd1;
+}
+
 .preview table tr:nth-child(2n) {
     background-color: #f6f8fa;
 }
 
 body.dark-theme .preview table th,
 body.dark-theme .preview table td {
-    border: 1px solid #444;
+    border: 1px solid #30363d;
 }
 
 body.dark-theme .preview table th {
-    background-color: #2d2d2d;
+    background-color: #161b22;
+}
+
+body.dark-theme .preview table tr {
+    background-color: #0d1117;
+    border-top: 1px solid #30363d;
 }
 
 body.dark-theme .preview table tr:nth-child(2n) {
-    background-color: #2d2d2d;
+    background-color: #161b22;
 }
 
-/* 通知样式 */
-.notification {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 1000;
+/* 水平线样式 */
+.preview hr {
+    height: 0.25em;
+    padding: 0;
+    margin: 24px 0;
+    background-color: #e1e4e8;
+    border: 0;
 }
 
-.notification.show {
-    opacity: 1;
+body.dark-theme .preview hr {
+    background-color: #30363d;
+}
+
+/* 图片样式 */
+.preview img {
+    max-width: 100%;
+    box-sizing: content-box;
+    background-color: #fff;
+}
+
+body.dark-theme .preview img {
+    background-color: #0d1117;
+}
+
+/* 任务列表样式 */
+.preview ul.contains-task-list {
+    padding-left: 0;
+}
+
+.preview ul.contains-task-list li {
+    list-style-type: none;
+}
+
+.preview ul.contains-task-list li input[type="checkbox"] {
+    margin: 0 0.2em 0.25em -1.6em;
+    vertical-align: middle;
+}
+
+/* 代码高亮 */
+.preview .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0.5em;
+    color: #24292e;
+    background: #f6f8fa;
+}
+
+body.dark-theme .preview .hljs {
+    color: #c9d1d9;
+    background: #161b22;
 }
 
 /* 打印样式 - 用于PDF导出 */
@@ -412,4 +512,162 @@ body.dark-theme .preview table tr:nth-child(2n) {
         white-space: pre-wrap;
         word-wrap: break-word;
     }
+}
+
+/* 分割线样式 */
+.gutter {
+    background-color: #f0f0f0;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    cursor: col-resize;
+    transition: background-color 0.3s;
+}
+
+body.dark-theme .gutter {
+    background-color: #2d2d2d;
+}
+
+.gutter.gutter-horizontal {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+    width: 10px !important;
+    margin: 0 -5px;
+    z-index: 10;
+}
+
+.gutter.gutter-horizontal:hover {
+    background-color: #e0e0e0;
+}
+
+body.dark-theme .gutter.gutter-horizontal:hover {
+    background-color: #3a3a3a;
+}
+
+/* 通知样式 */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: #2ea44f;
+    color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+body.dark-theme .notification {
+    background-color: #238636;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+/* 滚动同步按钮样式 */
+#sync-btn.active {
+    background-color: #e6f7ff;
+    border-color: #91d5ff;
+    color: #1890ff;
+}
+
+body.dark-theme #sync-btn.active {
+    background-color: #1f1f1f;
+    border-color: #177ddc;
+    color: #177ddc;
+}
+
+#sync-btn:not(.active) {
+    opacity: 0.7;
+}
+
+/* 美化滚动条样式 */
+/* 整体滚动条 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+/* 滚动条轨道 */
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* 暗色主题滚动条样式 */
+body.dark-theme ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 编辑器和预览区域特定滚动条样式 */
+.editor::-webkit-scrollbar, .preview::-webkit-scrollbar {
+    width: 8px;
+}
+
+.editor::-webkit-scrollbar-thumb, .preview::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.editor::-webkit-scrollbar-thumb:hover, .preview::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+body.dark-theme .editor::-webkit-scrollbar-thumb,
+body.dark-theme .preview::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-theme .editor::-webkit-scrollbar-thumb:hover,
+body.dark-theme .preview::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* 虚拟滚动相关样式 */
+.md-hidden {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.markdown-body p:not(.md-hidden),
+.markdown-body h1:not(.md-hidden),
+.markdown-body h2:not(.md-hidden),
+.markdown-body h3:not(.md-hidden),
+.markdown-body h4:not(.md-hidden),
+.markdown-body h5:not(.md-hidden),
+.markdown-body h6:not(.md-hidden),
+.markdown-body ul:not(.md-hidden),
+.markdown-body ol:not(.md-hidden),
+.markdown-body pre:not(.md-hidden),
+.markdown-body blockquote:not(.md-hidden),
+.markdown-body table:not(.md-hidden) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 性能优化：减少重绘和重排 */
+.editor, .preview, .line-numbers {
+    will-change: transform;
+    transform: translateZ(0);
 }
