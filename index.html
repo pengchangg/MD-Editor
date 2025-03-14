@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 本应用不依赖第三方 Cookie，仅使用 localStorage 进行本地存储 -->
     <title>MarkDown 编辑器</title>
     <!-- 预加载字体 -->
-    <link rel="preload" href="fonts/LXGWWenKai-Light.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="fonts/LXGWWenKai-Light.ttf" as="font" type="font/ttf" crossorigin fetchpriority="high">
     <!-- 引入 Split.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
     <!-- 引入 marked.js -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@5.1.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
     <!-- 引入 highlight.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" id="code-theme">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" id="code-theme">
     <!-- 引入图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入 html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- 引入自定义样式 -->
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body class="light-theme">
     <div class="toolbar">
@@ -51,17 +51,21 @@
 
     <div class="container">
         <div class="content">
-            <div class="editor">
+            <div class="editor-container">
                 <div class="line-numbers" id="line-numbers"></div>
                 <textarea id="editor" placeholder="请输入 Markdown 文本..."></textarea>
             </div>
             <div class="preview" id="preview"></div>
         </div>
         <div class="status-bar">
-            <span class="editor-status">字符数: 0</span>
-            <span class="cursor-position">行: 1, 列: 0</span>
-            <span class="save-message">已保存</span>
-            <span class="autosave-status">自动保存: 关闭</span>
+            <div class="status-bar-item editor-status"><i class="fas fa-info-circle"></i>字符数: <span id="char-count">0</span></div>
+            <div class="status-bar-item cursor-position"><i class="fas fa-map-marker-alt"></i>行: <span id="line-pos">1</span>, 列: <span id="col-pos">0</span></div>
+            <div class="status-bar-item save-message"><i class="fas fa-save"></i><span id="save-status">已保存</span></div>
+            <div class="status-bar-item autosave-status"><i class="fas fa-clock"></i>自动保存: <span id="autosave-status">关闭</span></div>
+            <div class="status-bar-item storage-info">
+                <i class="fas fa-database"></i>占用空间: <span id="storage-size">0 KB</span>
+                <button id="cleanup-images-btn" title="清理未使用的图片" class="icon-button"><i class="fas fa-broom"></i></button>
+            </div>
         </div>
     </div>
 
@@ -72,7 +76,7 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Markdown 编辑器快捷键</h2>
-            <table>
+            <table id="shortcut-table">
                 <thead>
                     <tr>
                         <th>快捷键</th>
@@ -80,29 +84,48 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>Ctrl+B</td><td>粗体</td></tr>
-                    <tr><td>Ctrl+I</td><td>斜体</td></tr>
-                    <tr><td>Ctrl+K</td><td>链接</td></tr>
-                    <tr><td>Ctrl+Shift+I</td><td>图片</td></tr>
-                    <tr><td>Ctrl+`</td><td>行内代码</td></tr>
-                    <tr><td>Ctrl+Shift+C</td><td>代码块</td></tr>
-                    <tr><td>Ctrl+Shift+B</td><td>引用块</td></tr>
-                    <tr><td>Ctrl+Shift+L</td><td>无序列表</td></tr>
-                    <tr><td>Ctrl+Shift+O</td><td>有序列表</td></tr>
-                    <tr><td>Ctrl+Shift+T</td><td>表格</td></tr>
-                    <tr><td>Ctrl+1 到 Ctrl+6</td><td>标题 1-6</td></tr>
-                    <tr><td>Ctrl+Shift+X</td><td>删除线</td></tr>
-                    <tr><td>Ctrl+Shift+H</td><td>水平分割线</td></tr>
-                    <tr><td>Ctrl+Shift+K</td><td>任务列表</td></tr>
-                    <tr><td>Ctrl+S</td><td>保存</td></tr>
-                    <tr><td>Ctrl+Z</td><td>撤销</td></tr>
-                    <tr><td>Ctrl+Y 或 Ctrl+Shift+Z</td><td>重做</td></tr>
+                    <!-- 快捷键内容将由JavaScript动态生成 -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- 引入自定义脚本 -->
-    <script src="js/index.js"></script>
+    <!-- 本地图片上传对话框 -->
+    <div id="image-upload-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>插入本地图片</h2>
+            <div class="upload-container">
+                <input type="file" id="image-file" accept="image/*">
+                <button id="upload-image-btn">插入图片</button>
+            </div>
+            <div class="image-preview-container">
+                <p>预览:</p>
+                <div id="image-preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入工具函数模块 -->
+    <script src="js/utils/utils.js"></script>
+    <script src="js/utils/performance.js"></script>
+    <script src="js/utils/storage.js"></script>
+    <script src="js/utils/export.js"></script>
+    
+    <!-- 引入编辑器模块 -->
+    <script src="js/editor/editor.js"></script>
+    <script src="js/editor/history.js"></script>
+    <script src="js/editor/line-numbers.js"></script>
+    <script src="js/editor/title-manager.js"></script>
+    
+    <!-- 引入UI模块 -->
+    <script src="js/ui/toolbar.js"></script>
+    <script src="js/ui/theme.js"></script>
+    <script src="js/ui/shortcuts.js"></script>
+    <script src="js/ui/modal.js"></script>
+    <script src="js/ui/image-handler.js"></script>
+    
+    <!-- 引入主入口文件 -->
+    <script src="js/main.js"></script>
 </body>
 </html>

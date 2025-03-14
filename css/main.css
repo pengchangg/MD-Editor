@@ -1,0 +1,254 @@
+/* 主样式文件 - 包含全局样式和导入其他样式文件 */
+
+/* 导入其他样式文件 */
+@import url('editor.css');
+@import url('preview.css');
+@import url('toolbar.css');
+@import url('modal.css');
+@import url('theme.css');
+
+/* 全局样式 */
+@font-face {
+    font-family: 'LXGW WenKai';
+    src: url('../fonts/LXGWWenKai-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    font-size: 120%; /* 增加整体显示大小 */
+    --accent-color: #2e86de; /* 主要强调色 - 更鲜明的蓝色 */
+    --accent-color-hover: #1c6dc9; /* 悬停状态强调色 */
+    --accent-color-light: rgba(46, 134, 222, 0.2); /* 轻量强调色 */
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --error-color: #e74c3c;
+    --info-color: #3498db;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'LXGW WenKai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.editor-container, .preview-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.gutter {
+    background-color: var(--gutter-bg);
+    width: 14px; /* 增加分割线宽度 */
+    cursor: col-resize;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.status-bar {
+    height: 38px; /* 增加状态栏高度 */
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--status-bar-bg);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+}
+
+.status-bar-item {
+    display: flex;
+    align-items: center;
+}
+
+.status-bar-item:not(:last-child) {
+    margin-right: 20px;
+}
+
+.status-bar-item i {
+    margin-right: 5px;
+    color: var(--accent-color);
+}
+
+/* 图标按钮样式 */
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 3px 6px;
+    margin-left: 8px;
+    border-radius: 4px;
+    color: var(--text-color);
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.icon-button:hover {
+    background-color: var(--accent-color-light);
+    opacity: 1;
+}
+
+.icon-button:active {
+    transform: scale(0.95);
+}
+
+.icon-button i {
+    margin-right: 0;
+}
+
+/* 保存状态样式 */
+.saved {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.unsaved {
+    color: var(--warning-color);
+    font-weight: bold;
+}
+
+.loaded {
+    color: var(--info-color);
+    font-weight: bold;
+}
+
+/* 通知样式 - 居中显示 */
+.notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    padding: 15px 25px;
+    background-color: var(--notification-bg);
+    color: var(--notification-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s, transform 0.5s, visibility 0.5s;
+    font-weight: 500;
+    text-align: center;
+    min-width: 300px;
+    max-width: 80%;
+    border-left: 5px solid var(--accent-color-hover);
+    pointer-events: auto; /* 确保可以点击 */
+    cursor: pointer; /* 指示可点击 */
+}
+
+.notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* 通知类型样式 */
+.notification-success {
+    background-color: rgba(46, 204, 113, 0.9);
+    border-left-color: #27ae60;
+    color: white;
+}
+
+.notification-error {
+    background-color: rgba(231, 76, 60, 0.9);
+    border-left-color: #c0392b;
+    color: white;
+}
+
+.notification-warning {
+    background-color: rgba(243, 156, 18, 0.9);
+    border-left-color: #d35400;
+    color: white;
+}
+
+.notification-info {
+    background-color: rgba(52, 152, 219, 0.9);
+    border-left-color: #2980b9;
+    color: white;
+}
+
+/* 本地图片上传样式 */
+.upload-container {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#image-file {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    width: 100%;
+}
+
+#upload-image-btn {
+    padding: 10px 15px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#upload-image-btn:hover {
+    background-color: var(--accent-color-hover);
+}
+
+.image-preview-container {
+    margin-top: 20px;
+}
+
+#image-preview {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow: auto;
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#image-preview img {
+    max-width: 100%;
+    max-height: 180px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+    }
+    
+    .gutter {
+        width: 100%;
+        height: 14px;
+        cursor: row-resize;
+    }
+} 

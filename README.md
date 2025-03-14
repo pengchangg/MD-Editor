@@ -10,12 +10,23 @@
 - **智能滚动同步**：编辑区和预览区滚动自动同步，支持基于标题的智能定位
 - **主题切换**：支持亮色、暗色和自动（跟随系统）三种主题模式
 - **自动保存**：可选的自动保存功能，防止意外丢失内容
-- **导出功能**：支持导出为Markdown文件和PDF文件
+- **增强的导出功能**：支持一键导出为Markdown文件和PDF文件，自动使用文档标题作为文件名
 - **丰富的编辑工具**：提供粗体、斜体、标题、链接、图片、列表、引用、代码块等快捷工具
 - **键盘快捷键**：支持多种常用编辑操作的键盘快捷键
 - **行号显示**：显示行号并高亮当前行号，方便定位编辑位置
 - **历史记录**：支持撤销和重做操作
 - **性能优化**：针对长文档进行了性能优化，支持虚拟滚动和代码高亮懒加载
+- **图片处理**：支持本地图片上传和管理，自动保存到localStorage
+- **错误处理**：增强的错误处理机制，确保编辑器在各种情况下都能稳定运行
+
+## 最新更新
+
+- **导出功能优化**：重构了导出模块，提高了稳定性和用户体验
+  - 支持从文档标题自动生成文件名
+  - 增强的错误处理，防止导出过程中的异常
+  - 改进的PDF导出，更好地保留文档格式
+- **图片处理增强**：改进了图片上传和存储机制，防止无效图片数据导致的问题
+- **界面交互优化**：优化了下拉菜单和按钮的交互体验
 
 ## 技术栈
 
@@ -79,34 +90,11 @@
 - 编辑内容（markdown-editor-content）
 - 主题设置（markdown-editor-theme）
 - 自动保存设置（markdown-editor-autosave）
+- 上传的图片数据（markdown-editor-images）
 
 ## 许可证
 
 [MIT](LICENSE)
-
-```
-MIT License
-
-Copyright (c) 2023 Your Name
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
 
 ## 贡献指南
 

@@ -10,12 +10,23 @@ English | [中文](README.md)
 - **Intelligent Scroll Synchronization**: Automatic synchronization between editor and preview areas, with smart heading-based positioning
 - **Theme Switching**: Support for light, dark, and automatic (system-following) theme modes
 - **Auto-save**: Optional auto-save functionality to prevent accidental content loss
-- **Export Options**: Export to Markdown file or PDF
+- **Enhanced Export Options**: One-click export to Markdown file or PDF, with automatic filename generation from document title
 - **Rich Editing Tools**: Quick access to bold, italic, headings, links, images, lists, quotes, code blocks, and more
 - **Keyboard Shortcuts**: Support for various common editing operations via keyboard shortcuts
 - **Line Numbers**: Display line numbers with current line indicator for easy position tracking
 - **History Management**: Support for undo and redo operations
 - **Performance Optimization**: Optimized for long documents with virtual scrolling and lazy code highlighting
+- **Image Handling**: Support for local image uploads and management, automatically saved to localStorage
+- **Error Handling**: Enhanced error handling mechanisms to ensure editor stability in various scenarios
+
+## Latest Updates
+
+- **Export Functionality Improvements**: Refactored the export module for better stability and user experience
+  - Automatic filename generation from document title
+  - Enhanced error handling to prevent exceptions during export
+  - Improved PDF export with better document formatting preservation
+- **Image Processing Enhancements**: Improved image upload and storage mechanisms to prevent issues with invalid image data
+- **UI Interaction Optimization**: Enhanced dropdown menus and button interactions
 
 ## Technology Stack
 
@@ -79,10 +90,15 @@ The editor uses the browser's localStorage to store the following information:
 - Editor content (markdown-editor-content)
 - Theme settings (markdown-editor-theme)
 - Auto-save settings (markdown-editor-autosave)
+- Uploaded image data (markdown-editor-images)
 
 ## License
 
 [MIT](LICENSE)
+
+## Contributing
+
+Issues and Pull Requests are welcome to help improve this project!
 
 ```
 MIT License
@@ -107,7 +123,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
-
-## Contributing
-
-Issues and Pull Requests are welcome to help improve this project!

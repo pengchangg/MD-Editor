@@ -1,5 +1,16 @@
 // 初始化分栏
 document.addEventListener('DOMContentLoaded', function() {
+    // 检测操作系统
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const modKey = isMac ? '⌘' : 'Ctrl'; // 修饰键：Mac用⌘，其他用Ctrl
+    const altKey = isMac ? '⌥' : 'Alt';  // 辅助键：Mac用⌥，其他用Alt
+
+    // 标题缓存
+    let titleCache = {
+        text: '',
+        title: ''
+    };
+
     // 防抖函数：用于优化频繁触发的事件
     function debounce(func, wait, immediate) {
         let timeout;
@@ -42,13 +53,23 @@ document.addEventListener('DOMContentLoaded', function() {
         currentIndex: -1,
         maxStates: 100,
         isUndoRedo: false,
+        lastState: null, // 用于比较状态是否变化
 
         // 添加新状态
         addState: function(state) {
+            // 如果是撤销/重做操作触发的状态变化，不记录
             if (this.isUndoRedo) {
                 this.isUndoRedo = false;
                 return;
             }
+
+            // 如果与上一个状态相同，不记录
+            if (this.lastState === state) {
+                return;
+            }
+
+            // 记录最后一个状态用于比较
+            this.lastState = state;
 
             // 如果当前不是最新状态，删除当前之后的所有状态
             if (this.currentIndex < this.states.length - 1) {
@@ -61,12 +82,17 @@ document.addEventListener('DOMContentLoaded', function() {
             // 如果状态数超过最大值，删除最早的状态
             if (this.states.length > this.maxStates) {
                 this.states.shift();
+                // 调整当前索引
+                this.currentIndex = Math.max(0, this.currentIndex - 1);
             } else {
                 this.currentIndex++;
             }
 
             // 更新按钮状态
             this.updateButtons();
+            
+            // 调试信息
+            console.log(`历史记录: 添加状态 #${this.currentIndex}, 总状态数: ${this.states.length}`);
         },
 
         // 撤销
@@ -74,11 +100,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.currentIndex > 0) {
                 this.currentIndex--;
                 this.isUndoRedo = true;
-                editor.value = this.states[this.currentIndex];
+                const state = this.states[this.currentIndex];
+                editor.value = state;
+                this.lastState = state; // 更新最后状态
                 updatePreview();
                 updateEditorStatus();
                 updateLineNumbers();
                 this.updateButtons();
+                
+                // 调试信息
+                console.log(`历史记录: 撤销到状态 #${this.currentIndex}`);
             }
         },
 
@@ -87,11 +118,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.currentIndex < this.states.length - 1) {
                 this.currentIndex++;
                 this.isUndoRedo = true;
-                editor.value = this.states[this.currentIndex];
+                const state = this.states[this.currentIndex];
+                editor.value = state;
+                this.lastState = state; // 更新最后状态
                 updatePreview();
                 updateEditorStatus();
                 updateLineNumbers();
                 this.updateButtons();
+                
+                // 调试信息
+                console.log(`历史记录: 重做到状态 #${this.currentIndex}`);
             }
         },
 
@@ -99,6 +135,15 @@ document.addEventListener('DOMContentLoaded', function() {
         updateButtons: function() {
             undoBtn.disabled = this.currentIndex <= 0;
             redoBtn.disabled = this.currentIndex >= this.states.length - 1;
+        },
+        
+        // 清空历史记录
+        clear: function() {
+            this.states = [];
+            this.currentIndex = -1;
+            this.lastState = null;
+            this.isUndoRedo = false;
+            this.updateButtons();
         }
     };
 
@@ -130,6 +175,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLineNumbers();
     }, 30);
 
+    // 创建一个防抖版本的标题更新函数
+    const debouncedUpdateDocumentTitle = debounce(function() {
+        updateDocumentTitle();
+    }, 300); // 较长的延迟，避免频繁更新标题
+
     // 配置 marked 使用 GitHub 风格的渲染
     marked.use({
         breaks: true,
@@ -138,7 +188,8 @@ document.addEventListener('DOMContentLoaded', function() {
         sanitize: false,
         smartLists: true,
         smartypants: false,
-        xhtml: false
+        xhtml: false,
+        mangle: false  // 禁用 mangle 参数，解决警告
     });
 
     // 行号和当前行高亮功能
@@ -190,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 实时预览功能
-    editor.addEventListener('input', function() {
+    editor.addEventListener('input', function(e) {
         // 立即更新编辑器状态，提供即时反馈
         updateEditorStatus();
 
@@ -207,6 +258,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (autoSaveEnabled) {
             resetAutoSaveTimer();
         }
+    });
+
+    // 监听编辑器的粘贴事件
+    editor.addEventListener('paste', function(e) {
+        // 延迟一下再添加到历史记录，确保粘贴内容已经更新到编辑器
+        setTimeout(() => {
+            history.addState(editor.value);
+        }, 0);
+    });
+
+    // 监听编辑器的剪切事件
+    editor.addEventListener('cut', function(e) {
+        // 延迟一下再添加到历史记录，确保剪切操作已经更新到编辑器
+        setTimeout(() => {
+            history.addState(editor.value);
+        }, 0);
     });
 
     // 为预览区域中的标题添加ID
@@ -318,11 +385,79 @@ document.addEventListener('DOMContentLoaded', function() {
                 setupVirtualScroll();
             }
 
+            // 更新网站标题
+            debouncedUpdateDocumentTitle();
+
             // 记录性能指标
             performanceMetrics.recordMetric('renderTime', renderTime);
         } catch (error) {
             console.error('Markdown 渲染错误:', error);
             preview.innerHTML = `<div class="markdown-body"><p>渲染错误: ${error.message}</p></div>`;
+        }
+    }
+
+    // 更新网站标题
+    function updateDocumentTitle() {
+        // 查找编辑器中的第一个标题
+        const text = editor.value;
+        
+        // 优化：只检查文本的前200个字符，通常标题都在文档开头
+        const startText = text.substring(0, 200);
+        
+        // 检查缓存，如果前200个字符没有变化，直接使用缓存的标题
+        if (startText === titleCache.text) {
+            // 只有当标题发生变化时才更新
+            if (document.title !== titleCache.title) {
+                document.title = titleCache.title;
+            }
+            return;
+        }
+        
+        // 支持多种标题格式：
+        // 1. # 标题格式
+        // 2. 标题
+        //    =====
+        // 3. 标题
+        //    -----
+        let titleText = null;
+        
+        // 尝试匹配 # 格式标题 (优化正则表达式)
+        const hashTitleMatch = startText.match(/^(#{1,6})\s+([^\n]+)/m);
+        if (hashTitleMatch && hashTitleMatch[2]) {
+            titleText = hashTitleMatch[2].trim();
+        } else {
+            // 尝试匹配 ===== 格式标题（h1）
+            const h1TitleMatch = startText.match(/^([^\n]+)\n={3,}$/m);
+            if (h1TitleMatch && h1TitleMatch[1]) {
+                titleText = h1TitleMatch[1].trim();
+            } else {
+                // 尝试匹配 ----- 格式标题（h2）
+                const h2TitleMatch = startText.match(/^([^\n]+)\n-{3,}$/m);
+                if (h2TitleMatch && h2TitleMatch[1]) {
+                    titleText = h2TitleMatch[1].trim();
+                }
+            }
+        }
+        
+        // 设置网站标题
+        let newTitle = 'MarkDown 编辑器';
+        if (titleText) {
+            // 如果标题太长，截断它
+            if (titleText.length > 50) {
+                titleText = titleText.substring(0, 47) + '...';
+            }
+            
+            // 生成新标题
+            newTitle = `${titleText} - MarkDown 编辑器`;
+        }
+        
+        // 更新缓存
+        titleCache.text = startText;
+        titleCache.title = newTitle;
+        
+        // 只有当标题发生变化时才更新
+        if (document.title !== newTitle) {
+            document.title = newTitle;
         }
     }
 
@@ -543,9 +678,12 @@ document.addEventListener('DOMContentLoaded', function() {
         notification.textContent = message;
         notification.classList.add('show');
 
-        setTimeout(() => {
-            notification.classList.remove('show');
-        }, duration);
+        // 只有当duration大于0时才自动隐藏
+        if (duration > 0) {
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
     }
 
     // 显示状态栏保存消息
@@ -615,25 +753,175 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 导出为PDF
     function exportPDF() {
+        // 显示加载指示器
+        showNotification('正在生成PDF，请稍候...', 0);
+        
         // 创建一个新的预览区域用于PDF导出
         const pdfPreview = document.createElement('div');
+        pdfPreview.className = 'markdown-body pdf-export';
         pdfPreview.innerHTML = preview.innerHTML;
-        pdfPreview.style.padding = '20px';
-        pdfPreview.style.fontSize = '14px';
+        
+        // 获取当前代码高亮主题
+        const codeTheme = document.getElementById('code-theme').href;
+        const isLightTheme = document.body.classList.contains('light-theme');
+        
+        // 添加GitHub风格的样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .pdf-export {
+                font-family: 'LXGW WenKai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+                line-height: 1.6;
+                color: #24292e;
+                font-size: 14px;
+                padding: 20px;
+                background-color: white;
+            }
+            .pdf-export h1, .pdf-export h2, .pdf-export h3, .pdf-export h4, .pdf-export h5, .pdf-export h6 {
+                margin-top: 24px;
+                margin-bottom: 16px;
+                font-weight: 600;
+                line-height: 1.25;
+            }
+            .pdf-export h1 {
+                font-size: 2em;
+                padding-bottom: 0.3em;
+                border-bottom: 1px solid #eaecef;
+            }
+            .pdf-export h2 {
+                font-size: 1.5em;
+                padding-bottom: 0.3em;
+                border-bottom: 1px solid #eaecef;
+            }
+            .pdf-export h3 { font-size: 1.25em; }
+            .pdf-export h4 { font-size: 1em; }
+            .pdf-export h5 { font-size: 0.875em; }
+            .pdf-export h6 { font-size: 0.85em; color: #6a737d; }
+            .pdf-export p { margin-bottom: 16px; }
+            .pdf-export a { color: #0366d6; text-decoration: none; }
+            .pdf-export blockquote {
+                padding: 0 1em;
+                color: #6a737d;
+                border-left: 0.25em solid #dfe2e5;
+                margin: 0 0 16px 0;
+            }
+            .pdf-export ul, .pdf-export ol {
+                padding-left: 2em;
+                margin-bottom: 16px;
+            }
+            .pdf-export li { margin-top: 0.25em; }
+            .pdf-export pre {
+                background-color: #f6f8fa;
+                border-radius: 3px;
+                padding: 16px;
+                overflow: auto;
+                font-size: 85%;
+                line-height: 1.45;
+                margin-bottom: 16px;
+                page-break-inside: avoid;
+            }
+            .pdf-export code {
+                background-color: rgba(27, 31, 35, 0.05);
+                border-radius: 3px;
+                font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+                font-size: 85%;
+                padding: 0.2em 0.4em;
+            }
+            .pdf-export pre code {
+                background-color: transparent;
+                padding: 0;
+                border-radius: 0;
+            }
+            .pdf-export table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-bottom: 16px;
+                page-break-inside: avoid;
+            }
+            .pdf-export table th, .pdf-export table td {
+                padding: 6px 13px;
+                border: 1px solid #dfe2e5;
+            }
+            .pdf-export table tr:nth-child(2n) {
+                background-color: #f6f8fa;
+            }
+            .pdf-export img {
+                max-width: 100%;
+                box-sizing: content-box;
+                page-break-inside: avoid;
+            }
+            .pdf-export hr {
+                height: 0.25em;
+                padding: 0;
+                margin: 24px 0;
+                background-color: #e1e4e8;
+                border: 0;
+            }
+            /* 确保分页时标题不会被分割 */
+            .pdf-export h1, .pdf-export h2, .pdf-export h3, 
+            .pdf-export h4, .pdf-export h5, .pdf-export h6 {
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+            .pdf-export p, .pdf-export blockquote {
+                orphans: 3;
+                widows: 3;
+            }
+        `;
+        
+        // 添加代码高亮链接
+        const highlightLink = document.createElement('link');
+        highlightLink.rel = 'stylesheet';
+        highlightLink.href = codeTheme;
+        document.head.appendChild(highlightLink);
+        
+        document.body.appendChild(style);
+        document.body.appendChild(pdfPreview);
+        
+        // 确保代码高亮应用到所有代码块
+        pdfPreview.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+        });
 
         // 配置PDF选项
         const opt = {
-            margin: [10, 10, 10, 10],
+            margin: [15, 15, 15, 15],
             filename: 'markdown-document.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                logging: false
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait',
+                compress: true
+            }
         };
 
         // 生成PDF
         html2pdf().set(opt).from(pdfPreview).save().then(() => {
+            // 清理临时元素
+            document.body.removeChild(pdfPreview);
+            document.body.removeChild(style);
+            document.head.removeChild(highlightLink);
             showSaveMessage('已导出为PDF文件');
+            // 隐藏加载指示器
+            hideNotification();
+        }).catch(error => {
+            console.error('PDF导出错误:', error);
+            document.body.removeChild(pdfPreview);
+            document.body.removeChild(style);
+            document.head.removeChild(highlightLink);
+            showNotification('PDF导出失败: ' + error.message);
         });
+    }
+
+    // 隐藏通知
+    function hideNotification() {
+        const notification = document.getElementById('notification');
+        notification.classList.remove('show');
     }
 
     // 工具栏按钮功能
@@ -686,10 +974,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 撤销和重做功能
     undoBtn.addEventListener('click', function() {
+        console.log('撤销按钮点击');
         history.undo();
     });
 
     redoBtn.addEventListener('click', function() {
+        console.log('重做按钮点击');
         history.redo();
     });
 
@@ -797,9 +1087,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('shortcut-help');
     const helpBtn = document.getElementById('help-btn');
     const closeBtn = document.querySelector('.close');
+    const shortcutTable = document.getElementById('shortcut-table').querySelector('tbody');
+
+    // 生成快捷键表格
+    function generateShortcutTable() {
+        // 清空表格
+        shortcutTable.innerHTML = '';
+        
+        // 定义快捷键列表
+        const shortcuts = [
+            { key: `${modKey}+B`, action: '粗体' },
+            { key: `${modKey}+I`, action: '斜体' },
+            { key: `${modKey}+K`, action: '链接' },
+            { key: `${modKey}+Shift+I`, action: '图片' },
+            { key: `${modKey}+\``, action: '行内代码' },
+            { key: `${modKey}+Shift+C`, action: '代码块' },
+            { key: `${modKey}+Shift+B`, action: '引用块' },
+            { key: `${modKey}+Shift+L`, action: '无序列表' },
+            { key: `${modKey}+Shift+O`, action: '有序列表' },
+            { key: `${modKey}+Shift+T`, action: '表格' },
+            { key: `${modKey}+1 到 ${modKey}+6`, action: '标题 1-6' },
+            { key: `${modKey}+Shift+X`, action: '删除线' },
+            { key: `${modKey}+Shift+H`, action: '水平分割线' },
+            { key: `${modKey}+Shift+K`, action: '任务列表' },
+            { key: `${modKey}+S`, action: '保存' },
+            { key: `${modKey}+Z`, action: '撤销' },
+            { key: `${modKey}+Y 或 ${modKey}+Shift+Z`, action: '重做' }
+        ];
+        
+        // 添加到表格
+        shortcuts.forEach(shortcut => {
+            const row = document.createElement('tr');
+            const keyCell = document.createElement('td');
+            const actionCell = document.createElement('td');
+            
+            keyCell.textContent = shortcut.key;
+            actionCell.textContent = shortcut.action;
+            
+            row.appendChild(keyCell);
+            row.appendChild(actionCell);
+            shortcutTable.appendChild(row);
+        });
+    }
 
     // 显示对话框
     helpBtn.addEventListener('click', function() {
+        generateShortcutTable();
         modal.style.display = 'block';
     });
 
@@ -881,6 +1214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         renderTime: [],
         scrollSyncTime: [],
         lineNumberUpdateTime: [],
+        titleUpdateTime: [], // 新增标题更新性能指标
 
         // 记录性能指标
         recordMetric: function(category, time) {
@@ -905,7 +1239,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return {
                 averageRenderTime: this.getAverage('renderTime').toFixed(2) + 'ms',
                 averageScrollSyncTime: this.getAverage('scrollSyncTime').toFixed(2) + 'ms',
-                averageLineNumberUpdateTime: this.getAverage('lineNumberUpdateTime').toFixed(2) + 'ms'
+                averageLineNumberUpdateTime: this.getAverage('lineNumberUpdateTime').toFixed(2) + 'ms',
+                averageTitleUpdateTime: this.getAverage('titleUpdateTime').toFixed(2) + 'ms' // 新增标题更新性能指标
             };
         },
 
@@ -936,13 +1271,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const originalUpdateLineNumbers = updateLineNumbers;
     updateLineNumbers = measurePerformance(originalUpdateLineNumbers, 'lineNumberUpdateTime');
 
+    const originalUpdateDocumentTitle = updateDocumentTitle;
+    updateDocumentTitle = measurePerformance(originalUpdateDocumentTitle, 'titleUpdateTime');
+
     // 每分钟记录一次性能报告
     setInterval(() => {
         performanceMetrics.logReport();
     }, 60000);
 
+    // 添加调试功能
+    function debugHistory() {
+        console.log('历史记录状态:', {
+            states: history.states.length,
+            currentIndex: history.currentIndex,
+            canUndo: history.currentIndex > 0,
+            canRedo: history.currentIndex < history.states.length - 1
+        });
+    }
+    
+    // 定期检查历史记录状态
+    setInterval(debugHistory, 5000);
+
     // 初始化
     function init() {
+        // 清空历史记录
+        history.clear();
+        
         // 加载保存的内容
         const savedContent = localStorage.getItem('markdown-editor-content');
         if (savedContent) {
@@ -1009,13 +1363,17 @@ console.log('Hello, Markdown!');
             resetAutoSaveTimer();
         }
 
-        // 初始化历史记录
-        history.addState(editor.value);
-
         // 更新预览和状态
         updatePreview();
         updateEditorStatus();
         updateLineNumbers();
+        
+        // 更新网站标题
+        debouncedUpdateDocumentTitle();
+        
+        // 初始化历史记录 - 添加初始状态
+        history.addState(editor.value);
+        console.log('历史记录已初始化');
 
         // 禁用初始状态的撤销按钮
         undoBtn.disabled = true;
@@ -1023,89 +1381,97 @@ console.log('Hello, Markdown!');
 
         // 添加滚动同步开关按钮
         addScrollSyncButton();
+        
+        // 显示快捷键模式提示
+        setTimeout(() => {
+            showNotification(`当前使用${isMac ? 'macOS' : 'Windows/Linux'}快捷键模式: ${modKey}键作为修饰键`, 5000);
+        }, 1000);
     }
 
     // 添加键盘快捷键
     document.addEventListener('keydown', function(e) {
         // 如果编辑器获得焦点，处理特定的快捷键
         const isEditorFocused = document.activeElement === editor;
+        
+        // 检测修饰键是否按下（Mac用metaKey，其他用ctrlKey）
+        const isModKeyPressed = isMac ? e.metaKey : e.ctrlKey;
 
-        // Ctrl+Z: 撤销
-        if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+        // Mod+Z: 撤销
+        if (isModKeyPressed && e.key === 'z' && !e.shiftKey) {
             e.preventDefault();
             history.undo();
         }
 
-        // Ctrl+Y 或 Ctrl+Shift+Z: 重做
-        if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
+        // Mod+Y 或 Mod+Shift+Z: 重做
+        if ((isModKeyPressed && e.key === 'y') || (isModKeyPressed && e.shiftKey && e.key === 'z')) {
             e.preventDefault();
             history.redo();
         }
 
-        // Ctrl+S: 保存
-        if (e.ctrlKey && e.key === 's') {
+        // Mod+S: 保存
+        if (isModKeyPressed && e.key === 's') {
             e.preventDefault();
             saveDocument();
         }
 
         // 仅当编辑器获得焦点时处理以下快捷键
         if (isEditorFocused) {
-            // Ctrl+B: 粗体
-            if (e.ctrlKey && e.key === 'b') {
+            // Mod+B: 粗体
+            if (isModKeyPressed && e.key === 'b') {
                 e.preventDefault();
                 insertText('**', '**', '粗体文本');
             }
 
-            // Ctrl+I: 斜体
-            if (e.ctrlKey && e.key === 'i') {
+            // Mod+I: 斜体
+            if (isModKeyPressed && e.key === 'i') {
                 e.preventDefault();
                 insertText('*', '*', '斜体文本');
             }
 
-            // Ctrl+K: 链接
-            if (e.ctrlKey && e.key === 'k') {
+            // Mod+K: 链接
+            if (isModKeyPressed && e.key === 'k') {
                 e.preventDefault();
                 insertText('[', '](https://example.com)', '链接文本');
             }
 
-            // Ctrl+Shift+I: 图片
-            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+            // Mod+Shift+I: 图片
+            if (isModKeyPressed && e.shiftKey && e.key === 'I') {
                 e.preventDefault();
                 insertText('![', '](https://example.com/image.jpg)', '图片描述');
             }
 
-            // Ctrl+Shift+C: 代码块
-            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+            // Mod+Shift+C: 代码块
+            if (isModKeyPressed && e.shiftKey && e.key === 'C') {
                 e.preventDefault();
                 insertText('```\n', '\n```', '代码块');
             }
 
-            // Ctrl+`: 行内代码
-            if (e.ctrlKey && e.key === '`') {
+            // Mod+`: 行内代码
+            if (isModKeyPressed && e.key === '`') {
                 e.preventDefault();
                 insertText('`', '`', '行内代码');
             }
 
-            // Ctrl+Shift+B: 引用块
-            if (e.ctrlKey && e.shiftKey && e.key === 'B') {
+            // Mod+Shift+B: 引用块
+            if (isModKeyPressed && e.shiftKey && e.key === 'B') {
                 e.preventDefault();
                 insertText('> ', '', '引用文本');
             }
 
-            // Ctrl+Shift+L: 无序列表
-            if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+            // Mod+Shift+L: 无序列表
+            if (isModKeyPressed && e.shiftKey && e.key === 'L') {
                 e.preventDefault();
                 insertText('- ', '', '列表项');
             }
 
-            // Ctrl+Shift+O: 有序列表
-            if (e.ctrlKey && e.shiftKey && e.key === 'O') {
+            // Mod+Shift+O: 有序列表
+            if (isModKeyPressed && e.shiftKey && e.key === 'O') {
                 e.preventDefault();
                 insertText('1. ', '', '列表项');
             }
 
-            // Ctrl+Shift+T: 表格
-            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+            // Mod+Shift+T: 表格
+            if (isModKeyPressed && e.shiftKey && e.key === 'T') {
                 e.preventDefault();
                 const tableTemplate =
 `| 标题1 | 标题2 | 标题3 |
@@ -1115,28 +1481,28 @@ console.log('Hello, Markdown!');
                 insertText('', '', tableTemplate);
             }
 
-            // Ctrl+1 到 Ctrl+6: 标题 1-6
-            if (e.ctrlKey && e.key >= '1' && e.key <= '6') {
+            // Mod+1 到 Mod+6: 标题 1-6
+            if (isModKeyPressed && e.key >= '1' && e.key <= '6') {
                 e.preventDefault();
                 const level = e.key;
                 const prefix = '#'.repeat(parseInt(level)) + ' ';
                 insertText(prefix, '', '标题');
             }
 
-            // Ctrl+Shift+X: 删除线
-            if (e.ctrlKey && e.shiftKey && e.key === 'X') {
+            // Mod+Shift+X: 删除线
+            if (isModKeyPressed && e.shiftKey && e.key === 'X') {
                 e.preventDefault();
                 insertText('~~', '~~', '删除线文本');
             }
 
-            // Ctrl+Shift+H: 水平分割线
-            if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+            // Mod+Shift+H: 水平分割线
+            if (isModKeyPressed && e.shiftKey && e.key === 'H') {
                 e.preventDefault();
                 insertText('\n---\n', '', '');
             }
 
-            // Ctrl+Shift+K: 任务列表
-            if (e.ctrlKey && e.shiftKey && e.key === 'K') {
+            // Mod+Shift+K: 任务列表
+            if (isModKeyPressed && e.shiftKey && e.key === 'K') {
                 e.preventDefault();
                 insertText('- [ ] ', '', '任务项');
             }
@@ -1144,19 +1510,19 @@ console.log('Hello, Markdown!');
     });
 
     // 添加快捷键提示到工具栏按钮
-    document.getElementById('bold-btn').title = '粗体 (Ctrl+B)';
-    document.getElementById('italic-btn').title = '斜体 (Ctrl+I)';
-    document.getElementById('heading-btn').title = '标题 (Ctrl+1 到 Ctrl+6)';
-    document.getElementById('link-btn').title = '链接 (Ctrl+K)';
-    document.getElementById('image-btn').title = '图片 (Ctrl+Shift+I)';
-    document.getElementById('list-btn').title = '无序列表 (Ctrl+Shift+L)';
-    document.getElementById('ordered-list-btn').title = '有序列表 (Ctrl+Shift+O)';
-    document.getElementById('quote-btn').title = '引用 (Ctrl+Shift+B)';
-    document.getElementById('code-btn').title = '代码块 (Ctrl+Shift+C)';
-    document.getElementById('table-btn').title = '表格 (Ctrl+Shift+T)';
-    document.getElementById('save-btn').title = '保存 (Ctrl+S)';
-    document.getElementById('undo-btn').title = '撤销 (Ctrl+Z)';
-    document.getElementById('redo-btn').title = '重做 (Ctrl+Y)';
+    document.getElementById('bold-btn').title = `粗体 (${modKey}+B)`;
+    document.getElementById('italic-btn').title = `斜体 (${modKey}+I)`;
+    document.getElementById('heading-btn').title = `标题 (${modKey}+1 到 ${modKey}+6)`;
+    document.getElementById('link-btn').title = `链接 (${modKey}+K)`;
+    document.getElementById('image-btn').title = `图片 (${modKey}+Shift+I)`;
+    document.getElementById('list-btn').title = `无序列表 (${modKey}+Shift+L)`;
+    document.getElementById('ordered-list-btn').title = `有序列表 (${modKey}+Shift+O)`;
+    document.getElementById('quote-btn').title = `引用 (${modKey}+Shift+B)`;
+    document.getElementById('code-btn').title = `代码块 (${modKey}+Shift+C)`;
+    document.getElementById('table-btn').title = `表格 (${modKey}+Shift+T)`;
+    document.getElementById('save-btn').title = `保存 (${modKey}+S)`;
+    document.getElementById('undo-btn').title = `撤销 (${modKey}+Z)`;
+    document.getElementById('redo-btn').title = `重做 (${modKey}+Y 或 ${modKey}+Shift+Z)`;
 
     // 初始化应用
     init();

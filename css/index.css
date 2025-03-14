@@ -523,14 +523,16 @@ body.dark-theme .preview .hljs {
         background-color: white;
         color: black;
     }
-    .toolbar, .editor, .gutter, .status-bar {
+    .toolbar, .editor, .gutter, .status-bar, .notification {
         display: none;
     }
     .container {
         height: auto;
+        overflow: visible;
     }
     .content {
         display: block;
+        height: auto;
     }
     .preview {
         width: 100%;
@@ -539,10 +541,28 @@ body.dark-theme .preview .hljs {
         background: white;
         color: black;
         border: none;
+        padding: 0;
     }
     .preview pre {
         white-space: pre-wrap;
         word-wrap: break-word;
+        page-break-inside: avoid;
+    }
+    .preview img {
+        max-width: 100%;
+        page-break-inside: avoid;
+    }
+    .preview table {
+        page-break-inside: avoid;
+    }
+    .preview h1, .preview h2, .preview h3, 
+    .preview h4, .preview h5, .preview h6 {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+    }
+    .preview p, .preview blockquote {
+        orphans: 3;
+        widows: 3;
     }
 }
 

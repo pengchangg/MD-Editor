@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导出功能测试</title>
+    <!-- 引入 html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #content {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        #log {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>导出功能测试</h1>
+    
+    <div id="content">
+        <h2>测试内容</h2>
+        <p>这是一个简单的测试，用于验证导出功能。</p>
+    </div>
+    
+    <div>
+        <button id="export-md">导出Markdown</button>
+        <button id="export-pdf">导出PDF</button>
+    </div>
+    
+    <div id="log">
+        <div>日志输出：</div>
+    </div>
+    
+    <script>
+        // 简单的日志函数
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('log');
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] [${type}] ${message}`;
+            
+            if (type === 'error') {
+                logEntry.style.color = 'red';
+            } else if (type === 'success') {
+                logEntry.style.color = 'green';
+            }
+            
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${type}] ${message}`);
+        }
+        
+        // 导出Markdown
+        document.getElementById('export-md').addEventListener('click', function() {
+            log('开始导出Markdown');
+            
+            try {
+                // 创建Blob对象
+                const text = document.getElementById('content').innerText;
+                const blob = new Blob([text], { type: 'text/markdown' });
+                
+                // 创建下载链接
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'test.md';
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 0);
+                
+                log('Markdown导出成功', 'success');
+            } catch (error) {
+                log('导出Markdown时出错: ' + error.message, 'error');
+            }
+        });
+        
+        // 导出PDF
+        document.getElementById('export-pdf').addEventListener('click', function() {
+            log('开始导出PDF');
+            
+            try {
+                // 检查html2pdf是否可用
+                if (typeof html2pdf !== 'function') {
+                    log('html2pdf库未加载或不可用', 'error');
+                    return;
+                }
+                
+                log('html2pdf库已加载', 'success');
+                
+                // 获取内容元素
+                const element = document.getElementById('content');
+                if (!element) {
+                    log('找不到内容元素', 'error');
+                    return;
+                }
+                
+                log('找到内容元素', 'success');
+                
+                // 配置选项
+                const opt = {
+                    margin: 10,
+                    filename: 'test.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                log('PDF选项配置完成');
+                
+                // 导出PDF
+                html2pdf(element, opt);
+                log('PDF导出请求已发送', 'success');
+            } catch (error) {
+                log('导出PDF时出错: ' + error.message, 'error');
+            }
+        });
+        
+        // 页面加载完成
+        window.addEventListener('DOMContentLoaded', function() {
+            log('页面加载完成');
+            log('html2pdf是否可用: ' + (typeof html2pdf === 'function' ? '是' : '否'));
+        });
+    </script>
+</body>
+</html> 
