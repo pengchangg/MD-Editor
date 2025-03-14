@@ -186,6 +186,9 @@ const ExportModule = {
                 return;
             }
             
+            console.log('预览内容HTML长度:', preview.innerHTML.length);
+            console.log('预览内容HTML前100个字符:', preview.innerHTML.substring(0, 100));
+            
             // 克隆预览内容并应用PDF样式
             const clonedContent = preview.cloneNode(true);
             
@@ -319,25 +322,39 @@ const ExportModule = {
                 return;
             }
             
+            console.log('预览内容HTML长度:', preview.innerHTML.length);
+            console.log('预览内容HTML前100个字符:', preview.innerHTML.substring(0, 100));
+            
             UIUtils.showNotification('正在生成PDF，请稍候...', 'info');
             
-            // 创建一个克隆的预览区域
-            const clonedPreview = document.createElement('div');
-            clonedPreview.innerHTML = preview.innerHTML;
-            clonedPreview.style.width = '210mm';
-            clonedPreview.style.padding = '20mm';
-            clonedPreview.style.position = 'absolute';
-            clonedPreview.style.left = '-9999px';
+            // 创建一个新的div元素，而不是直接克隆预览内容
+            const pdfContent = document.createElement('div');
+            pdfContent.innerHTML = preview.innerHTML;
+            pdfContent.style.width = '210mm';
+            pdfContent.style.padding = '20mm';
+            pdfContent.style.backgroundColor = '#ffffff';
+            pdfContent.style.color = '#000000';
+            pdfContent.style.fontFamily = 'Arial, sans-serif';
+            pdfContent.style.fontSize = '12pt';
+            pdfContent.style.lineHeight = '1.5';
             
-            // 添加自定义样式，移除左侧灰色竖线
-            const style = document.createElement('style');
-            style.textContent = `
+            // 添加自定义样式
+            const styleElement = document.createElement('style');
+            styleElement.textContent = `
+                /* 基本样式 */
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.5;
+                    color: #000000;
+                }
+                
                 /* 移除左侧灰色竖线 */
                 blockquote {
                     border-left: none !important;
                     padding-left: 1em !important;
                     background-color: rgba(0,0,0,0.03) !important;
                     border-radius: 4px !important;
+                    margin: 1em 0 !important;
                 }
                 
                 /* 改进表格样式 */
@@ -362,10 +379,12 @@ const ExportModule = {
                     border-radius: 4px;
                     padding: 16px;
                     overflow: auto;
+                    white-space: pre-wrap;
+                    word-break: break-word;
                 }
                 
                 code {
-                    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+                    font-family: 'Courier New', Courier, monospace;
                     font-size: 0.9em;
                 }
                 
@@ -374,39 +393,92 @@ const ExportModule = {
                     max-width: 100%;
                     height: auto;
                 }
+                
+                /* 标题样式 */
+                h1, h2, h3, h4, h5, h6 {
+                    margin-top: 1.5em;
+                    margin-bottom: 0.5em;
+                    page-break-after: avoid;
+                }
+                
+                h1 { font-size: 2em; }
+                h2 { font-size: 1.5em; }
+                h3 { font-size: 1.3em; }
+                h4 { font-size: 1.2em; }
+                h5 { font-size: 1.1em; }
+                h6 { font-size: 1em; }
+                
+                /* 段落样式 */
+                p {
+                    margin: 1em 0;
+                }
+                
+                /* 列表样式 */
+                ul, ol {
+                    margin: 1em 0;
+                    padding-left: 2em;
+                }
+                
+                li {
+                    margin: 0.5em 0;
+                }
             `;
             
-            clonedPreview.appendChild(style);
-            document.body.appendChild(clonedPreview);
+            // 将样式添加到文档中
+            document.head.appendChild(styleElement);
+            
+            // 将内容添加到文档中以便html2pdf可以处理
+            pdfContent.style.position = 'absolute';
+            pdfContent.style.left = '-9999px';
+            document.body.appendChild(pdfContent);
+            
+            console.log('PDF内容已准备，开始生成PDF');
+            console.log('PDF内容元素:', pdfContent);
+            console.log('PDF内容HTML长度:', pdfContent.innerHTML.length);
             
             // 配置选项
             const opt = {
-                margin: 10,
+                margin: [10, 10, 10, 10],
                 filename: fileName + '.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
                     scale: 2,
                     useCORS: true,
-                    logging: false
+                    logging: true,
+                    letterRendering: true,
+                    allowTaint: true
                 },
                 jsPDF: { 
                     unit: 'mm', 
                     format: 'a4', 
-                    orientation: 'portrait'
+                    orientation: 'portrait',
+                    compress: true
                 }
             };
             
             // 导出PDF
-            html2pdf().from(clonedPreview).set(opt).save().then(() => {
-                // 清理
-                document.body.removeChild(clonedPreview);
-                console.log('PDF导出成功:', fileName);
-                UIUtils.showNotification(`已导出为 ${fileName}.pdf`, 'success');
-            }).catch(error => {
-                document.body.removeChild(clonedPreview);
-                console.error('PDF导出失败:', error);
-                UIUtils.showNotification('PDF导出失败: ' + error.message, 'error');
-            });
+            html2pdf()
+                .from(pdfContent)
+                .set(opt)
+                .save()
+                .then(() => {
+                    // 清理
+                    document.body.removeChild(pdfContent);
+                    document.head.removeChild(styleElement);
+                    console.log('PDF导出成功:', fileName);
+                    UIUtils.showNotification(`已导出为 ${fileName}.pdf`, 'success');
+                })
+                .catch(error => {
+                    // 清理
+                    if (document.body.contains(pdfContent)) {
+                        document.body.removeChild(pdfContent);
+                    }
+                    if (document.head.contains(styleElement)) {
+                        document.head.removeChild(styleElement);
+                    }
+                    console.error('PDF导出失败:', error);
+                    UIUtils.showNotification('PDF导出失败: ' + error.message, 'error');
+                });
         } catch (error) {
             console.error('导出PDF时出错:', error);
             UIUtils.showNotification('导出失败: ' + error.message, 'error');

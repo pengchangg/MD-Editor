@@ -278,12 +278,16 @@ const Editor = (function() {
                 }
             }
             
-            // 更新预览内容
+            // 更新预览内容 - 直接使用HTML，不添加markdown-body类
             try {
-                preview.innerHTML = `<div class="markdown-body">${html}</div>`;
+                preview.innerHTML = html;
+                
+                // 调试信息
+                console.debug('预览内容已更新，HTML长度:', html.length);
+                console.debug('预览内容前100个字符:', html.substring(0, 100));
             } catch (error) {
                 console.error('设置预览HTML时出错:', error);
-                preview.innerHTML = `<div class="markdown-body"><div class="error">设置预览HTML时出错: ${error.message}</div></div>`;
+                preview.innerHTML = `<div class="error">设置预览HTML时出错: ${error.message}</div>`;
             }
             
             // 高亮代码块
@@ -297,9 +301,9 @@ const Editor = (function() {
         } catch (error) {
             console.error('预览更新错误:', error);
             try {
-                preview.innerHTML = `<div class="markdown-body"><div class="error">预览更新错误: ${error.message}</div></div>`;
-            } catch (innerError) {
-                console.error('设置错误预览时出错:', innerError);
+                preview.innerHTML = `<div class="error">预览更新错误: ${error.message}</div>`;
+            } catch (e) {
+                console.error('设置错误信息时出错:', e);
             }
         }
     }

@@ -1,151 +1,174 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>导出功能测试</title>
+    <title>PDF导出测试</title>
     <!-- 引入 html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
+            line-height: 1.6;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
+        
+        .container {
+            margin-bottom: 20px;
+        }
+        
         button {
-            padding: 10px 20px;
-            margin: 10px;
+            padding: 10px 15px;
             background-color: #4CAF50;
             color: white;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            margin-right: 10px;
         }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
         #content {
             border: 1px solid #ddd;
             padding: 20px;
-            margin-bottom: 20px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
         }
-        #log {
-            border: 1px solid #ddd;
+        
+        pre {
+            background-color: #f5f5f5;
             padding: 10px;
-            margin-top: 20px;
-            height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        blockquote {
+            border-left: 4px solid #ccc;
+            padding-left: 15px;
+            color: #666;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <h1>导出功能测试</h1>
+    <h1>PDF导出测试页面</h1>
+    
+    <div class="container">
+        <p>这个页面用于测试html2pdf.js库的PDF导出功能。点击下面的按钮导出内容为PDF。</p>
+        <button id="export-btn">导出为PDF</button>
+        <button id="export-with-options-btn">导出为PDF（自定义选项）</button>
+    </div>
     
     <div id="content">
-        <h2>测试内容</h2>
-        <p>这是一个简单的测试，用于验证导出功能。</p>
-    </div>
-    
-    <div>
-        <button id="export-md">导出Markdown</button>
-        <button id="export-pdf">导出PDF</button>
-    </div>
-    
-    <div id="log">
-        <div>日志输出：</div>
+        <h2>示例内容</h2>
+        <p>这是一段普通文本，用于测试PDF导出功能。</p>
+        
+        <h3>Markdown常用元素</h3>
+        
+        <h4>1. 列表</h4>
+        <ul>
+            <li>无序列表项1</li>
+            <li>无序列表项2</li>
+            <li>无序列表项3</li>
+        </ul>
+        
+        <ol>
+            <li>有序列表项1</li>
+            <li>有序列表项2</li>
+            <li>有序列表项3</li>
+        </ol>
+        
+        <h4>2. 引用块</h4>
+        <blockquote>
+            这是一个引用块。引用块通常用于引用他人的话或者强调某段内容。
+        </blockquote>
+        
+        <h4>3. 代码块</h4>
+        <pre><code>// 这是一段代码
+function hello() {
+    console.log("Hello, world!");
+}
+
+hello();</code></pre>
+        
+        <h4>4. 表格</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>表头1</th>
+                    <th>表头2</th>
+                    <th>表头3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>单元格1</td>
+                    <td>单元格2</td>
+                    <td>单元格3</td>
+                </tr>
+                <tr>
+                    <td>单元格4</td>
+                    <td>单元格5</td>
+                    <td>单元格6</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h4>5. 图片</h4>
+        <p>下面是一个示例图片：</p>
+        <img src="https://via.placeholder.com/300x200" alt="示例图片">
     </div>
     
     <script>
-        // 简单的日志函数
-        function log(message, type = 'info') {
-            const logElement = document.getElementById('log');
-            const logEntry = document.createElement('div');
-            logEntry.textContent = `[${new Date().toLocaleTimeString()}] [${type}] ${message}`;
-            
-            if (type === 'error') {
-                logEntry.style.color = 'red';
-            } else if (type === 'success') {
-                logEntry.style.color = 'green';
-            }
-            
-            logElement.appendChild(logEntry);
-            logElement.scrollTop = logElement.scrollHeight;
-            console.log(`[${type}] ${message}`);
-        }
-        
-        // 导出Markdown
-        document.getElementById('export-md').addEventListener('click', function() {
-            log('开始导出Markdown');
-            
-            try {
-                // 创建Blob对象
-                const text = document.getElementById('content').innerText;
-                const blob = new Blob([text], { type: 'text/markdown' });
-                
-                // 创建下载链接
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'test.md';
-                document.body.appendChild(a);
-                a.click();
-                
-                // 清理
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 0);
-                
-                log('Markdown导出成功', 'success');
-            } catch (error) {
-                log('导出Markdown时出错: ' + error.message, 'error');
-            }
+        document.getElementById('export-btn').addEventListener('click', function() {
+            // 基本导出
+            const element = document.getElementById('content');
+            html2pdf(element);
         });
         
-        // 导出PDF
-        document.getElementById('export-pdf').addEventListener('click', function() {
-            log('开始导出PDF');
+        document.getElementById('export-with-options-btn').addEventListener('click', function() {
+            // 带选项的导出
+            const element = document.getElementById('content');
             
-            try {
-                // 检查html2pdf是否可用
-                if (typeof html2pdf !== 'function') {
-                    log('html2pdf库未加载或不可用', 'error');
-                    return;
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: 'test.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: true
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait'
                 }
-                
-                log('html2pdf库已加载', 'success');
-                
-                // 获取内容元素
-                const element = document.getElementById('content');
-                if (!element) {
-                    log('找不到内容元素', 'error');
-                    return;
-                }
-                
-                log('找到内容元素', 'success');
-                
-                // 配置选项
-                const opt = {
-                    margin: 10,
-                    filename: 'test.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2 },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-                
-                log('PDF选项配置完成');
-                
-                // 导出PDF
-                html2pdf(element, opt);
-                log('PDF导出请求已发送', 'success');
-            } catch (error) {
-                log('导出PDF时出错: ' + error.message, 'error');
-            }
-        });
-        
-        // 页面加载完成
-        window.addEventListener('DOMContentLoaded', function() {
-            log('页面加载完成');
-            log('html2pdf是否可用: ' + (typeof html2pdf === 'function' ? '是' : '否'));
+            };
+            
+            // 新的Promise链方式
+            html2pdf().from(element).set(opt).save();
         });
     </script>
 </body>

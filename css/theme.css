@@ -1,10 +1,27 @@
 /* 主题样式文件 - 包含亮色和暗色主题样式 */
 
+/* 全局变量 */
+:root {
+    --accent-color: #2e86de;
+    --accent-color-light: rgba(46, 134, 222, 0.2);
+    --accent-color-hover: #1c6dc9;
+    --error-color: #e74c3c;
+    --warning-color: #f39c12;
+    --success-color: #27ae60;
+    --info-color: #3498db;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --code-font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
 /* 亮色主题 */
 .light-theme {
     --bg-color: #ffffff;
+    --bg-color-secondary: #f8f8f8;
+    --bg-color-hover: #f0f0f0;
     --text-color: #333333;
+    --text-color-light: #6a737d;
     --border-color: #dddddd;
+    --border-color-light: #eeeeee;
     --toolbar-bg: #f5f5f5;
     --editor-bg: #f8f8f8;
     --line-numbers-bg: #f0f0f0;
@@ -15,11 +32,12 @@
     --link-color: var(--accent-color);
     --blockquote-color: #6a737d;
     --blockquote-border: var(--accent-color);
-    --code-bg: rgba(27, 31, 35, 0.05);
+    --code-bg-color: rgba(27, 31, 35, 0.05);
     --pre-bg: #f6f8fa;
     --table-border: #dfe2e5;
     --table-row-bg: #ffffff;
     --table-alt-row-bg: #f6f8fa;
+    --table-header-bg: #f2f2f2;
     --hr-color: var(--accent-color-light);
     --notification-bg: var(--accent-color);
     --notification-color: #ffffff;
@@ -31,8 +49,12 @@
 /* 暗色主题 */
 .dark-theme {
     --bg-color: #1e1e1e;
+    --bg-color-secondary: #252526;
+    --bg-color-hover: #2d2d2d;
     --text-color: #e0e0e0;
+    --text-color-light: #a0a0a0;
     --border-color: #444444;
+    --border-color-light: #555555;
     --toolbar-bg: #252526;
     --editor-bg: #1e1e1e;
     --line-numbers-bg: #252526;
@@ -43,11 +65,12 @@
     --link-color: #5ca8ff;
     --blockquote-color: #a0a0a0;
     --blockquote-border: var(--accent-color);
-    --code-bg: rgba(255, 255, 255, 0.1);
+    --code-bg-color: rgba(255, 255, 255, 0.1);
     --pre-bg: #2d2d2d;
     --table-border: #444444;
     --table-row-bg: #1e1e1e;
     --table-alt-row-bg: #252526;
+    --table-header-bg: #333333;
     --hr-color: #444444;
     --notification-bg: var(--accent-color);
     --notification-color: #ffffff;
@@ -60,6 +83,7 @@
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
+    font-family: var(--font-family);
 }
 
 .toolbar {
@@ -111,6 +135,84 @@ body {
     color: var(--notification-color);
 }
 
+/* 通知类型样式 */
+.notification.success {
+    background-color: var(--success-color);
+}
+
+.notification.error {
+    background-color: var(--error-color);
+}
+
+.notification.warning {
+    background-color: var(--warning-color);
+}
+
+.notification.info {
+    background-color: var(--info-color);
+}
+
+/* 暗色主题下的预览样式 */
+.dark-theme .preview h1,
+.dark-theme .preview h2,
+.dark-theme .preview h3,
+.dark-theme .preview h4,
+.dark-theme .preview h5,
+.dark-theme .preview h6 {
+    color: var(--heading-color);
+}
+
+.dark-theme .preview h1,
+.dark-theme .preview h2 {
+    border-color: var(--border-color);
+}
+
+.dark-theme .preview a {
+    color: var(--link-color);
+}
+
+.dark-theme .preview blockquote {
+    color: var(--text-color-light);
+    border-color: var(--blockquote-border);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-theme .preview code {
+    background-color: var(--code-bg-color);
+}
+
+.dark-theme .preview pre {
+    background-color: var(--pre-bg);
+    border-color: var(--border-color);
+}
+
+.dark-theme .preview table th {
+    background-color: var(--table-header-bg);
+}
+
+.dark-theme .preview table th,
+.dark-theme .preview table td {
+    border-color: var(--table-border);
+}
+
+.dark-theme .preview table tr {
+    background-color: var(--table-row-bg);
+    border-color: var(--table-border);
+}
+
+.dark-theme .preview table tr:nth-child(2n) {
+    background-color: var(--table-alt-row-bg);
+}
+
+.dark-theme .preview hr {
+    background-color: var(--hr-color);
+}
+
+.dark-theme .preview img {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+}
+
 /* 暗色主题下的 Markdown 样式 */
 .dark-theme .markdown-body {
     color: var(--text-color);
@@ -151,7 +253,7 @@ body {
 }
 
 .dark-theme .markdown-body code {
-    background-color: var(--code-bg);
+    background-color: var(--code-bg-color);
 }
 
 .dark-theme .markdown-body pre {
