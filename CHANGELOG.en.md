@@ -2,7 +2,7 @@
 
 This document records all significant changes to the Markdown Editor.
 
-## [Unreleased]
+## [v1.0.0] - 2025-03-15
 
 ## 2025-03-15
 - Fixed the issue of empty content in exported PDFs
