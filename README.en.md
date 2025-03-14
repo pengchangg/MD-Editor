@@ -18,13 +18,21 @@ English | [中文](README.md)
 - **Performance Optimization**: Optimized for long documents with virtual scrolling and lazy code highlighting
 - **Image Handling**: Support for local image uploads and management, automatically saved to localStorage
 - **Error Handling**: Enhanced error handling mechanisms to ensure editor stability in various scenarios
-
-## Latest Updates
-
-- **Export Functionality Improvements**: Refactored the export module for better stability and user experience
+- **Export Functionality**:
   - Automatic filename generation from document title
   - Enhanced error handling to prevent exceptions during export
   - Improved PDF export with better document formatting preservation
+  - Multiple PDF export methods to ensure functionality in different environments
+  - Prevention of duplicate exports to avoid generating multiple identical files
+
+## Latest Updates
+
+- **PDF Export Optimization**:
+  - Fixed the issue of empty content in exported PDFs
+  - Improved temporary container handling to ensure content renders correctly
+  - Added multiple fallback export methods to increase success rate
+  - Enhanced error handling and resource cleanup during export process
+  - Added support for automatic pagination to handle long documents
 - **Image Processing Enhancements**: Improved image upload and storage mechanisms to prevent issues with invalid image data
 - **UI Interaction Optimization**: Enhanced dropdown menus and button interactions
 
@@ -34,7 +42,7 @@ English | [中文](README.md)
 - [Marked](https://marked.js.org/) for Markdown parsing
 - [highlight.js](https://highlightjs.org/) for code syntax highlighting
 - [Split.js](https://split.js.org/) for split-pane layout
-- [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) for PDF export
+- [html2canvas](https://html2canvas.hertzen.com/) and [jsPDF](https://github.com/parallax/jsPDF) for PDF export
 - [Font Awesome](https://fontawesome.com/) for icons
 - Custom font: [LXGW WenKai](https://github.com/lxgw/LxgwWenKai)
 
@@ -51,13 +59,13 @@ English | [中文](README.md)
 2. Since the project is built with pure HTML/CSS/JavaScript, no build step is required. Simply host it with any web server:
    ```bash
    # Using Python's simple HTTP server
-   python -m http.server 8080
+   python3 -m http.server 8000
 
    # Or using Node.js http-server
-   npx http-server -p 8080
+   npx http-server -p 8000
    ```
 
-3. Access the editor in your browser at `http://localhost:8080`.
+3. Access the editor in your browser at `http://localhost:8000`.
 
 ### Online Deployment
 
@@ -78,6 +86,26 @@ English | [中文](README.md)
    Import your GitHub repository on the respective platform, or directly upload the project folder.
 
 2. Once deployed, access the editor through the assigned domain.
+
+## Usage Guide
+
+1. **Basic Editor Operations**:
+   - Left side is the editor area, right side is the preview area
+   - The toolbar provides common Markdown formatting functions
+   - The status bar displays character count, cursor position, and save status
+
+2. **Export Functionality**:
+   - Click the export button and select the export format (Markdown or PDF)
+   - Confirm the filename and content in the preview window
+   - Click the confirm export button to complete the export
+
+3. **Theme Switching**:
+   - Click the theme button in the top right corner to switch between light/dark themes
+   - Theme settings are automatically saved
+
+4. **Auto-save**:
+   - Click the auto-save button to enable/disable the auto-save feature
+   - When enabled, content is automatically saved every 30 seconds
 
 ## Browser Compatibility
 

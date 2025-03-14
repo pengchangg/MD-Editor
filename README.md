@@ -23,6 +23,17 @@
   - 支持从文档标题自动生成文件名
   - 增强的错误处理，防止导出过程中的异常
   - 改进的PDF导出，更好地保留文档格式
+  - 多种PDF导出方式，确保在不同环境下都能正常工作
+  - 防止重复导出，避免生成多个相同文件
+
+## 最新更新
+
+- **PDF导出功能优化**：
+  - 修复了PDF导出内容为空的问题
+  - 改进了临时容器的处理方式，确保内容能够正确渲染
+  - 添加了多层备用导出方案，提高导出成功率
+  - 优化了导出过程中的错误处理和资源清理
+  - 支持自动分页，处理长文档
 
 ## 技术栈
 
@@ -30,7 +41,7 @@
 - 使用[Marked](https://marked.js.org/)进行Markdown解析
 - 使用[highlight.js](https://highlightjs.org/)进行代码高亮
 - 使用[Split.js](https://split.js.org/)实现分栏布局
-- 使用[html2pdf.js](https://github.com/eKoopmans/html2pdf.js)实现PDF导出
+- 使用[html2canvas](https://html2canvas.hertzen.com/)和[jsPDF](https://github.com/parallax/jsPDF)实现PDF导出
 - 使用[Font Awesome](https://fontawesome.com/)提供图标支持
 - 自定义字体：[LXGW WenKai](https://github.com/lxgw/LxgwWenKai)
 
@@ -74,6 +85,26 @@
    在对应平台导入GitHub仓库，或直接上传项目文件夹。
 
 2. 部署完成后，通过分配的域名即可访问编辑器。
+
+## 使用说明
+
+1. **编辑器基本操作**：
+   - 左侧为编辑区，右侧为预览区
+   - 工具栏提供常用Markdown格式化功能
+   - 状态栏显示字符数、光标位置和保存状态
+
+2. **导出功能**：
+   - 点击导出按钮，选择导出格式（Markdown或PDF）
+   - 在弹出的预览窗口中确认文件名和内容
+   - 点击确认导出按钮完成导出
+
+3. **主题切换**：
+   - 点击右上角的主题按钮切换亮色/暗色主题
+   - 主题设置会自动保存
+
+4. **自动保存**：
+   - 点击自动保存按钮开启/关闭自动保存功能
+   - 开启后，编辑内容会每30秒自动保存一次
 
 ## 浏览器兼容性
 
