@@ -175,6 +175,8 @@ body.dark-theme .editor {
     overflow-y: hidden;
     position: relative;
     height: 100%; /* 确保高度填满编辑器 */
+    box-sizing: border-box; /* 确保盒模型一致 */
+    padding-top: 10px; /* 与编辑器文本区域的padding-top保持一致 */
 }
 
 body.dark-theme .line-numbers {
@@ -183,10 +185,16 @@ body.dark-theme .line-numbers {
     border-right: 1px solid #444;
 }
 
-.line-numbers div {
+.line-numbers .line-number {
     padding: 0 5px;
     transition: background-color 0.2s, color 0.2s;
     white-space: nowrap; /* 防止行号换行 */
+    display: flex; /* 使用flex布局 */
+    justify-content: flex-end; /* 数字右对齐 */
+    align-items: center; /* 垂直居中 */
+    height: 1.6em; /* 确保每行高度一致 */
+    box-sizing: border-box; /* 确保盒模型一致 */
+    line-height: 1.6; /* 确保行高一致 */
 }
 
 /* 当前行高亮 */
@@ -218,7 +226,8 @@ body.dark-theme .line-numbers {
     background-color: transparent;
     position: relative;
     z-index: 1;
-    transition: background-image 0.3s, color 0.3s;
+    transition: color 0.3s;
+    box-sizing: border-box; /* 确保盒模型一致 */
 }
 
 /* 暗色主题下的编辑器文本 */
@@ -702,24 +711,6 @@ body.dark-theme .preview::-webkit-scrollbar-thumb:hover {
 
 .dark-theme .editor-active-line {
     display: none;
-}
-
-/* 当前行高亮元素 */
-#current-line-highlight {
-    position: absolute;
-    left: 50px;
-    right: 0;
-    pointer-events: none;
-    z-index: 0;
-    transition: background-color 0.3s, transform 0.1s;
-}
-
-body.light-theme #current-line-highlight {
-    background-color: rgba(232, 244, 253, 0.9);
-}
-
-body.dark-theme #current-line-highlight {
-    background-color: rgba(55, 100, 140, 0.9);
 }
 
 /* 整体放大20% */

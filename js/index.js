@@ -125,6 +125,11 @@ document.addEventListener('DOMContentLoaded', function() {
         syncScrollPositions(fromEditor);
     }, 50);
 
+    // 创建一个防抖版本的滚动更新函数
+    const debouncedScrollUpdate = debounce(function() {
+        updateLineNumbers();
+    }, 30);
+
     // 配置 marked 使用 GitHub 风格的渲染
     marked.use({
         breaks: true,
@@ -161,9 +166,9 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let i = 1; i <= lineCount; i++) {
             const lineDiv = document.createElement('div');
             lineDiv.textContent = i;
-            lineDiv.style.height = '1.6em'; // 确保行高一致
+            lineDiv.className = 'line-number';
 
-            // 高亮当前行
+            // 高亮当前行号
             if (i === currentLineNumber) {
                 lineDiv.classList.add('active-line');
             }
@@ -175,45 +180,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentLine = lines[currentLineNumber - 1] || '';
         const column = cursorPos - (charCount - currentLine.length - 1);
         cursorPosition.textContent = `行: ${currentLineNumber}, 列: ${column}`;
-
-        // 高亮编辑器中的当前行
-        highlightCurrentLineInEditor(currentLineNumber);
     }
 
-    // 高亮编辑器中的当前行
-    function highlightCurrentLineInEditor(lineNumber) {
-        // 创建或获取高亮元素
-        let highlightElement = document.getElementById('current-line-highlight');
-        if (!highlightElement) {
-            highlightElement = document.createElement('div');
-            highlightElement.id = 'current-line-highlight';
-            editor.parentElement.appendChild(highlightElement);
-        }
-
-        // 获取行高和内边距
-        const computedStyle = window.getComputedStyle(editor);
-        const lineHeight = parseFloat(computedStyle.lineHeight);
-        const paddingTop = parseFloat(computedStyle.paddingTop);
-
-        // 计算高亮位置
-        const highlightPosition = (lineNumber - 1) * lineHeight + paddingTop;
-
-        // 设置高亮元素的样式
-        highlightElement.style.position = 'absolute';
-        highlightElement.style.left = '50px'; // 行号宽度
-        highlightElement.style.right = '0';
-        highlightElement.style.height = `${lineHeight}px`;
-        highlightElement.style.top = `${highlightPosition}px`;
-        highlightElement.style.pointerEvents = 'none';
-        highlightElement.style.zIndex = '0';
-        highlightElement.style.transform = `translateY(-${editor.scrollTop}px)`; // 确保高亮跟随滚动
-
-        // 根据主题设置不同的背景色
-        if (document.body.classList.contains('dark-theme')) {
-            highlightElement.style.backgroundColor = 'rgba(55, 100, 140, 0.9)';
-        } else {
-            highlightElement.style.backgroundColor = 'rgba(232, 244, 253, 0.9)';
-        }
+    // 移除高亮编辑器中的当前行函数
+    // 移除高亮元素（如果存在）
+    const existingHighlight = document.getElementById('current-line-highlight');
+    if (existingHighlight) {
+        existingHighlight.remove();
     }
 
     // 实时预览功能
@@ -511,6 +484,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 300);
             }, 50);
         }
+
+        // 使用防抖函数更新行号，避免频繁更新导致性能问题
+        debouncedScrollUpdate();
     });
 
     preview.addEventListener('scroll', function() {
@@ -543,16 +519,19 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLineNumbers();
     });
 
-    // 监听编辑器滚动，确保高亮行跟随滚动
+    // 监听编辑器滚动，确保行号跟随滚动
     editor.addEventListener('scroll', function() {
         // 更新行号滚动
         lineNumbers.scrollTop = editor.scrollTop;
 
-        // 更新高亮元素位置
-        const highlightElement = document.getElementById('current-line-highlight');
-        if (highlightElement) {
-            highlightElement.style.transform = `translateY(-${editor.scrollTop}px)`;
-        }
+        // 使用防抖函数更新行号，避免频繁更新导致性能问题
+        debouncedScrollUpdate();
+    });
+
+    // 监听窗口大小变化，重新计算行号和高亮
+    window.addEventListener('resize', function() {
+        // 使用防抖函数更新行号和高亮
+        debouncedUpdateLineNumbers();
     });
 
     function updateEditorStatus() {
