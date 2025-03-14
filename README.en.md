@@ -25,16 +25,7 @@ English | [中文](README.md)
   - Multiple PDF export methods to ensure functionality in different environments
   - Prevention of duplicate exports to avoid generating multiple identical files
 
-## Latest Updates
-
-- **PDF Export Optimization**:
-  - Fixed the issue of empty content in exported PDFs
-  - Improved temporary container handling to ensure content renders correctly
-  - Added multiple fallback export methods to increase success rate
-  - Enhanced error handling and resource cleanup during export process
-  - Added support for automatic pagination to handle long documents
-- **Image Processing Enhancements**: Improved image upload and storage mechanisms to prevent issues with invalid image data
-- **UI Interaction Optimization**: Enhanced dropdown menus and button interactions
+For detailed information about all updates, please check the [Changelog](CHANGELOG.en.md) ([中文](CHANGELOG.md)).
 
 ## Technology Stack
 
