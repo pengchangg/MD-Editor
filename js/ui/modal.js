@@ -76,6 +76,10 @@ const ModalModule = {
         // 触发模态框关闭事件
         const event = new CustomEvent('modal:close', { detail: { modal: modal } });
         document.dispatchEvent(event);
+        
+        // 触发模态框自身的关闭事件，便于其他模块监听
+        const modalClosedEvent = new CustomEvent('modalClosed');
+        modal.dispatchEvent(modalClosedEvent);
     },
     
     // 生成快捷键表格

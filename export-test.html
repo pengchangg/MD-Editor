@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF导出测试</title>
+    <title>PDF导出测试页面</title>
     <!-- 引入 html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -15,8 +15,15 @@
             padding: 20px;
         }
         
-        .container {
-            margin-bottom: 20px;
+        h1, h2, h3 {
+            color: #333;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
         }
         
         button {
@@ -26,7 +33,6 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
             margin-right: 10px;
         }
         
@@ -34,24 +40,15 @@
             background-color: #45a049;
         }
         
-        #content {
-            border: 1px solid #ddd;
-            padding: 20px;
-            margin: 20px 0;
-            background-color: #f9f9f9;
-        }
-        
         pre {
-            background-color: #f5f5f5;
-            padding: 10px;
-            border-radius: 4px;
+            background-color: #f6f8fa;
+            padding: 15px;
+            border-radius: 5px;
             overflow-x: auto;
         }
         
-        blockquote {
-            border-left: 4px solid #ccc;
-            padding-left: 15px;
-            color: #666;
+        code {
+            font-family: monospace;
         }
         
         table {
@@ -69,106 +66,134 @@
         th {
             background-color: #f2f2f2;
         }
+        
+        blockquote {
+            border-left: 4px solid #ddd;
+            padding-left: 15px;
+            color: #666;
+            margin: 15px 0;
+        }
+        
+        #content {
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>PDF导出测试页面</h1>
     
-    <div class="container">
-        <p>这个页面用于测试html2pdf.js库的PDF导出功能。点击下面的按钮导出内容为PDF。</p>
-        <button id="export-btn">导出为PDF</button>
-        <button id="export-with-options-btn">导出为PDF（自定义选项）</button>
+    <div class="controls">
+        <h2>测试控制</h2>
+        <p>点击下面的按钮测试PDF导出功能：</p>
+        <button id="export-basic">基本导出</button>
+        <button id="export-custom">自定义选项导出</button>
     </div>
     
     <div id="content">
-        <h2>示例内容</h2>
-        <p>这是一段普通文本，用于测试PDF导出功能。</p>
+        <h2>Markdown内容示例</h2>
         
-        <h3>Markdown常用元素</h3>
+        <h3>1. 标题和段落</h3>
+        <p>这是一个普通段落，包含<strong>粗体文本</strong>和<em>斜体文本</em>。</p>
         
-        <h4>1. 列表</h4>
+        <h3>2. 列表</h3>
+        <h4>无序列表</h4>
         <ul>
-            <li>无序列表项1</li>
-            <li>无序列表项2</li>
-            <li>无序列表项3</li>
+            <li>项目1</li>
+            <li>项目2
+                <ul>
+                    <li>子项目A</li>
+                    <li>子项目B</li>
+                </ul>
+            </li>
+            <li>项目3</li>
         </ul>
         
+        <h4>有序列表</h4>
         <ol>
-            <li>有序列表项1</li>
-            <li>有序列表项2</li>
-            <li>有序列表项3</li>
+            <li>第一项</li>
+            <li>第二项
+                <ol>
+                    <li>子项目1</li>
+                    <li>子项目2</li>
+                </ol>
+            </li>
+            <li>第三项</li>
         </ol>
         
-        <h4>2. 引用块</h4>
+        <h3>3. 引用</h3>
         <blockquote>
-            这是一个引用块。引用块通常用于引用他人的话或者强调某段内容。
+            <p>这是一个引用示例。</p>
+            <p>引用可以包含多个段落。</p>
         </blockquote>
         
-        <h4>3. 代码块</h4>
-        <pre><code>// 这是一段代码
-function hello() {
-    console.log("Hello, world!");
+        <h3>4. 代码</h3>
+        <p>行内代码：<code>console.log('Hello World');</code></p>
+        
+        <p>代码块：</p>
+        <pre><code>function sayHello() {
+  console.log('Hello, Markdown!');
+  return true;
 }
 
-hello();</code></pre>
+// 这是一个注释
+const result = sayHello();</code></pre>
         
-        <h4>4. 表格</h4>
+        <h3>5. 表格</h3>
         <table>
             <thead>
                 <tr>
-                    <th>表头1</th>
-                    <th>表头2</th>
-                    <th>表头3</th>
+                    <th>姓名</th>
+                    <th>年龄</th>
+                    <th>职业</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>单元格1</td>
-                    <td>单元格2</td>
-                    <td>单元格3</td>
+                    <td>张三</td>
+                    <td>25</td>
+                    <td>工程师</td>
                 </tr>
                 <tr>
-                    <td>单元格4</td>
-                    <td>单元格5</td>
-                    <td>单元格6</td>
+                    <td>李四</td>
+                    <td>30</td>
+                    <td>设计师</td>
+                </tr>
+                <tr>
+                    <td>王五</td>
+                    <td>28</td>
+                    <td>产品经理</td>
                 </tr>
             </tbody>
         </table>
-        
-        <h4>5. 图片</h4>
-        <p>下面是一个示例图片：</p>
-        <img src="https://via.placeholder.com/300x200" alt="示例图片">
     </div>
     
     <script>
-        document.getElementById('export-btn').addEventListener('click', function() {
-            // 基本导出
-            const element = document.getElementById('content');
-            html2pdf(element);
-        });
-        
-        document.getElementById('export-with-options-btn').addEventListener('click', function() {
-            // 带选项的导出
-            const element = document.getElementById('content');
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查html2pdf是否加载
+            console.log('html2pdf库状态:', typeof html2pdf === 'function' ? '已加载' : '未加载');
             
-            const opt = {
-                margin: [10, 10, 10, 10],
-                filename: 'test.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2,
-                    useCORS: true,
-                    logging: true
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'portrait'
-                }
-            };
+            // 基本导出按钮
+            document.getElementById('export-basic').addEventListener('click', function() {
+                const element = document.getElementById('content');
+                html2pdf(element);
+            });
             
-            // 新的Promise链方式
-            html2pdf().from(element).set(opt).save();
+            // 自定义选项导出按钮
+            document.getElementById('export-custom').addEventListener('click', function() {
+                const element = document.getElementById('content');
+                
+                const options = {
+                    margin: 10,
+                    filename: 'test-export.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                html2pdf().from(element).set(options).save();
+            });
         });
     </script>
 </body>

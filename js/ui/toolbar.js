@@ -63,7 +63,7 @@ const Toolbar = (function() {
         if (redoBtn) redoBtn.addEventListener('click', redo);
         if (saveBtn) saveBtn.addEventListener('click', save);
         
-        // 注意：导出按钮事件已在ExportNew模块中绑定
+        // 注意：导出按钮事件已在ExportModule中绑定
         
         console.debug('工具栏初始化完成');
     }

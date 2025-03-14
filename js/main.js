@@ -25,7 +25,14 @@ document.addEventListener('DOMContentLoaded', function() {
     ModalModule.init();
     PerformanceModule.init();
     Storage.init();
-    // 注意：ExportModule模块在自己的文件中已经初始化
+    
+    // 确保ExportModule正确初始化
+    if (typeof ExportModule !== 'undefined' && ExportModule.init) {
+        console.log('初始化ExportModule');
+        ExportModule.init();
+    } else {
+        console.error('ExportModule未定义或缺少init方法');
+    }
 
     // 加载初始内容
     const savedContent = localStorage.getItem('md_editor_content');
@@ -73,9 +80,9 @@ console.log('Hello, Markdown!');
     HistoryModule.addState(editor.value);
     
     // 显示快捷键模式提示
-    setTimeout(() => {
-        UIUtils.showNotification(`当前使用${AppConfig.isMac ? 'macOS' : 'Windows/Linux'}快捷键模式: ${AppConfig.modKey}键作为修饰键`, 5000);
-    }, 1000);
+    // setTimeout(() => {
+    //     UIUtils.showNotification(`当前使用${AppConfig.isMac ? 'macOS' : 'Windows/Linux'}快捷键模式: ${AppConfig.modKey}键作为修饰键`, 5000);
+    // }, 1000);
 
     console.log('Markdown编辑器初始化完成');
 });

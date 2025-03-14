@@ -16,10 +16,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" id="code-theme">
     <!-- 引入图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 引入 html2pdf.js -->
+    <!-- 引入 html2canvas.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- 引入 jsPDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- 保留 html2pdf.js 作为备用 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- 引入自定义样式 -->
     <link rel="stylesheet" href="css/main.css">
+    <!-- 添加调试信息 -->
+    <script>
+        // 检查必要的库是否正确加载
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('html2pdf库状态:', typeof html2pdf === 'function' ? '已加载' : '未加载');
+            console.log('html2canvas库状态:', typeof html2canvas === 'function' ? '已加载' : '未加载');
+            console.log('jsPDF库状态:', typeof jspdf !== 'undefined' ? '已加载' : '未加载');
+        });
+    </script>
 </head>
 <body class="light-theme">
     <div class="toolbar">
@@ -124,6 +137,11 @@
             </div>
             <div class="export-preview-container">
                 <div id="export-preview-content"></div>
+            </div>
+            <!-- 添加调试信息 -->
+            <div class="export-debug-info" style="margin-top: 10px; font-size: 0.8em; color: #888;">
+                <div>导出模块状态: <span id="export-module-status">检查中...</span></div>
+                <div>html2pdf状态: <span id="html2pdf-status">检查中...</span></div>
             </div>
         </div>
     </div>

@@ -20,7 +20,7 @@ const HistoryModule = {
         this.updateButtons();
         
         // 定期检查历史记录状态（调试用）
-        setInterval(this.debugHistory.bind(this), 5000);
+        // setInterval(this.debugHistory.bind(this), 5000);
     },
     
     // 添加新状态

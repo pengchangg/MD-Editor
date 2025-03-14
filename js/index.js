@@ -1290,7 +1290,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 定期检查历史记录状态
-    setInterval(debugHistory, 5000);
+    // setInterval(debugHistory, 5000);
 
     // 初始化
     function init() {
@@ -1383,9 +1383,9 @@ console.log('Hello, Markdown!');
         addScrollSyncButton();
         
         // 显示快捷键模式提示
-        setTimeout(() => {
-            showNotification(`当前使用${isMac ? 'macOS' : 'Windows/Linux'}快捷键模式: ${modKey}键作为修饰键`, 5000);
-        }, 1000);
+        // setTimeout(() => {
+        //     showNotification(`当前使用${isMac ? 'macOS' : 'Windows/Linux'}快捷键模式: ${modKey}键作为修饰键`, 5000);
+        // }, 1000);
     }
 
     // 添加键盘快捷键
