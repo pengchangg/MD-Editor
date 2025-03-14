@@ -13,7 +13,7 @@ English | [中文](README.md)
 - **Export Options**: Export to Markdown file or PDF
 - **Rich Editing Tools**: Quick access to bold, italic, headings, links, images, lists, quotes, code blocks, and more
 - **Keyboard Shortcuts**: Support for various common editing operations via keyboard shortcuts
-- **Line Numbers**: Display line numbers and highlight the current editing line
+- **Line Numbers**: Display line numbers with current line indicator for easy position tracking
 - **History Management**: Support for undo and redo operations
 - **Performance Optimization**: Optimized for long documents with virtual scrolling and lazy code highlighting
 
