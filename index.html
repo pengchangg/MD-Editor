@@ -106,6 +106,28 @@
         </div>
     </div>
 
+    <!-- 导出预览对话框 -->
+    <div id="export-preview-modal" class="modal">
+        <div class="modal-content export-preview-content">
+            <span class="close">&times;</span>
+            <div class="export-preview-header">
+                <h2>导出预览</h2>
+                <div class="export-actions">
+                    <div class="export-filename">
+                        <label for="export-filename">文件名:</label>
+                        <input type="text" id="export-filename" placeholder="document">
+                        <span id="export-extension">.md</span>
+                    </div>
+                    <button id="confirm-export-btn" class="primary-btn"><i class="fas fa-download"></i> 确认导出</button>
+                    <button id="cancel-export-btn" class="secondary-btn"><i class="fas fa-times"></i> 取消</button>
+                </div>
+            </div>
+            <div class="export-preview-container">
+                <div id="export-preview-content"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- 引入工具函数模块 -->
     <script src="js/utils/utils.js"></script>
     <script src="js/utils/performance.js"></script>

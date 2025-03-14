@@ -30,13 +30,6 @@ const ImageHandler = (function() {
         imageFile.addEventListener('change', previewImage);
         uploadBtn.addEventListener('click', insertImage);
         
-        // 点击模态框外部关闭
-        window.addEventListener('click', (e) => {
-            if (e.target === imageModal) {
-                closeImageModal();
-            }
-        });
-        
         // 绑定清理按钮事件
         const cleanupBtn = document.getElementById('cleanup-images-btn');
         if (cleanupBtn) {
@@ -51,14 +44,16 @@ const ImageHandler = (function() {
     
     // 打开图片上传模态框
     function openImageModal() {
-        imageModal.style.display = 'block';
+        // 使用ModalModule打开模态框
+        ModalModule.openModal(imageModal);
         imageFile.value = '';
         imagePreview.innerHTML = '';
     }
     
     // 关闭图片上传模态框
     function closeImageModal() {
-        imageModal.style.display = 'none';
+        // 使用ModalModule关闭模态框
+        ModalModule.closeModal(imageModal);
     }
     
     // 预览选择的图片

@@ -1,30 +1,81 @@
-// 模态框模块 - 负责快捷键帮助对话框
+// 模态框模块 - 负责所有模态框的管理
 const ModalModule = {
     // 初始化模态框模块
     init: function() {
-        // 获取模态框元素
-        const modal = document.getElementById('shortcut-help');
+        console.log('模态框模块初始化');
+        
+        // 获取快捷键帮助模态框元素
+        const shortcutModal = document.getElementById('shortcut-help');
         const helpBtn = document.getElementById('help-btn');
-        const closeBtn = document.querySelector('.close');
+        const shortcutCloseBtn = shortcutModal.querySelector('.close');
         const shortcutTable = document.getElementById('shortcut-table').querySelector('tbody');
         
-        // 显示对话框
+        // 显示快捷键帮助对话框
         helpBtn.addEventListener('click', () => {
             this.generateShortcutTable(shortcutTable);
-            modal.style.display = 'block';
+            this.openModal(shortcutModal);
         });
 
-        // 关闭对话框
-        closeBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
+        // 关闭快捷键帮助对话框
+        shortcutCloseBtn.addEventListener('click', () => {
+            this.closeModal(shortcutModal);
         });
-
-        // 点击对话框外部关闭
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
+        
+        // 绑定全局事件
+        this.bindGlobalEvents();
+    },
+    
+    // 绑定全局事件
+    bindGlobalEvents: function() {
+        // 点击模态框背景时关闭模态框
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                this.closeModal(e.target);
             }
         });
+        
+        // ESC键关闭模态框
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const openModals = document.querySelectorAll('.modal.show');
+                if (openModals.length > 0) {
+                    this.closeModal(openModals[openModals.length - 1]);
+                }
+            }
+        });
+    },
+    
+    // 打开模态框
+    openModal: function(modal) {
+        if (!modal) return;
+        
+        // 添加显示类
+        modal.classList.add('show');
+        modal.style.display = 'block';
+        document.body.classList.add('modal-open');
+        
+        // 触发模态框打开事件
+        const event = new CustomEvent('modal:open', { detail: { modal: modal } });
+        document.dispatchEvent(event);
+    },
+    
+    // 关闭模态框
+    closeModal: function(modal) {
+        if (!modal) return;
+        
+        // 移除显示类
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        
+        // 检查是否还有其他打开的模态框
+        const openModals = document.querySelectorAll('.modal.show');
+        if (openModals.length === 0) {
+            document.body.classList.remove('modal-open');
+        }
+        
+        // 触发模态框关闭事件
+        const event = new CustomEvent('modal:close', { detail: { modal: modal } });
+        document.dispatchEvent(event);
     },
     
     // 生成快捷键表格

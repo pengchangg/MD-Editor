@@ -93,3 +93,288 @@ body.dark-theme .modal-content th {
 body.dark-theme .modal-content tr:nth-child(even) {
     background-color: #161b22;
 }
+
+/* 模态框样式文件 - 包含对话框和弹出窗口样式 */
+
+/* 模态框容器 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* 模态框内容 */
+.modal-content {
+    position: relative;
+    background-color: var(--bg-color);
+    margin: 5% auto;
+    padding: 25px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease-out;
+}
+
+/* 关闭按钮 */
+.modal .close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    color: var(--text-color-light);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+    z-index: 10;
+}
+
+.modal .close:hover {
+    color: var(--accent-color);
+}
+
+/* 模态框标题 */
+.modal h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+/* 快捷键表格 */
+#shortcut-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#shortcut-table th, #shortcut-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+#shortcut-table th {
+    background-color: var(--bg-color-secondary);
+    font-weight: bold;
+}
+
+#shortcut-table tr:hover {
+    background-color: var(--bg-color-hover);
+}
+
+/* 图片上传容器 */
+.upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.upload-container input[type="file"] {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-color-secondary);
+}
+
+.upload-container button {
+    padding: 12px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.upload-container button:hover {
+    background-color: var(--accent-color-hover);
+}
+
+/* 图片预览容器 */
+.image-preview-container {
+    margin-top: 20px;
+}
+
+.image-preview-container p {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#image-preview {
+    max-width: 100%;
+    max-height: 300px;
+    border: 1px dashed var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+}
+
+#image-preview img {
+    max-width: 100%;
+    max-height: 280px;
+    object-fit: contain;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* 导出预览模态框样式 */
+.export-preview-content {
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.export-preview-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.export-preview-header h2 {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.export-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.export-filename {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.export-filename label {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.export-filename input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-color-secondary);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.export-filename span {
+    font-weight: bold;
+    color: var(--text-color-light);
+}
+
+.export-preview-container {
+    flex: 1;
+    overflow: auto;
+    padding: 25px;
+    background-color: var(--bg-color-secondary);
+    border-radius: 0 0 12px 12px;
+}
+
+#export-preview-content {
+    background-color: var(--bg-color);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-height: 300px;
+    max-width: 210mm;
+    margin: 0 auto;
+}
+
+/* PDF预览特殊样式 */
+#export-preview-content.pdf-preview {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* 按钮样式 */
+.primary-btn, .secondary-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.primary-btn {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.primary-btn:hover {
+    background-color: var(--accent-color-hover);
+}
+
+.secondary-btn {
+    background-color: var(--bg-color-secondary);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.secondary-btn:hover {
+    background-color: var(--bg-color-hover);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 15px;
+    }
+    
+    .export-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .export-filename {
+        width: 100%;
+    }
+}
