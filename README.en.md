@@ -9,6 +9,7 @@ English | [中文](README.md)
 - **Real-time Preview**: Instantly see the rendered output as you edit Markdown text
 - **Intelligent Scroll Synchronization**: Automatic synchronization between editor and preview areas, with smart heading-based positioning
 - **Theme Switching**: Support for light, dark, and automatic (system-following) theme modes
+- **Bilingual Interface**: Support for Chinese and English interface switching to meet different language preferences
 - **Auto-save**: Optional auto-save functionality to prevent accidental content loss
 - **Enhanced Export Options**: One-click export to Markdown file or PDF, with automatic filename generation from document title
 - **Rich Editing Tools**: Quick access to bold, italic, headings, links, images, lists, quotes, code blocks, and more

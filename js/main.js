@@ -33,6 +33,16 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error('ExportModule未定义或缺少init方法');
     }
+    
+    // 初始化语言模块 - 确保在所有UI元素加载完成后初始化
+    setTimeout(() => {
+        if (typeof LanguageModule !== 'undefined' && LanguageModule.init) {
+            console.log('初始化LanguageModule');
+            LanguageModule.init();
+        } else {
+            console.error('LanguageModule未定义或缺少init方法');
+        }
+    }, 100);
 
     // 加载初始内容
     const savedContent = localStorage.getItem('md_editor_content');
@@ -40,7 +50,11 @@ document.addEventListener('DOMContentLoaded', function() {
         editor.value = savedContent;
     } else {
         // 设置示例文本
-        editor.value = `# 欢迎使用 Markdown 编辑器
+        // 根据当前语言设置示例文本
+        if (typeof LanguageModule !== 'undefined' && LanguageModule.getTranslation) {
+            editor.value = LanguageModule.getTranslation('welcome-text');
+        } else {
+            editor.value = `# 欢迎使用 Markdown 编辑器
 
 ## 基本语法演示
 
@@ -69,6 +83,7 @@ console.log('Hello, Markdown!');
 
 [点击访问](https://www.example.com)
 `;
+        }
     }
 
     // 初始化编辑器状态

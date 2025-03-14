@@ -48,22 +48,11 @@ function processNotificationQueue() {
     const timer = setTimeout(() => {
         notification.classList.remove('show');
         
-        // 等待过渡动画完成后处理下一个通知
+        // 延迟一段时间后处理队列中的下一个通知
         setTimeout(() => {
             processNotificationQueue();
-        }, 500); // 与CSS过渡时间匹配
+        }, 300);
     }, duration);
-    
-    // 点击通知可以提前关闭
-    notification.onclick = function() {
-        clearTimeout(timer);
-        notification.classList.remove('show');
-        
-        // 等待过渡动画完成后处理下一个通知
-        setTimeout(() => {
-            processNotificationQueue();
-        }, 500); // 与CSS过渡时间匹配
-    };
 }
 
 // 格式化文件大小
@@ -190,27 +179,17 @@ function toggleClass(element, className) {
     }
 }
 
-// 工具函数模块 - 包含通用工具函数
+// 公开API
 const UIUtils = {
-    // 防抖函数：用于优化频繁触发的事件
-    debounce: function(func, wait, immediate) {
-        let timeout;
-        return function() {
-            const context = this, args = arguments;
-            const later = function() {
-                timeout = null;
-                if (!immediate) func.apply(context, args);
-            };
-            const callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-        };
-    },
-
-    // 显示通知
-    showNotification: function(message, type = 'info', duration = 3000) {
-        showNotification(message, type, duration);
+    showNotification: (message, duration = 3000, type = 'info') => {
+        // 如果存在语言模块，尝试翻译消息
+        if (typeof LanguageModule !== 'undefined' && LanguageModule.getTranslation) {
+            // 检查是否有对应的翻译键
+            const translatedMessage = LanguageModule.getTranslation(message) || message;
+            showNotification(translatedMessage, type, duration);
+        } else {
+            showNotification(message, type, duration);
+        }
     },
 
     // 隐藏通知
@@ -248,5 +227,28 @@ const UIUtils = {
 
         // 添加到历史记录
         HistoryModule.addState(editor.value);
+    },
+    
+    // 防抖函数
+    debounce: function(func, wait) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    },
+    
+    // 节流函数
+    throttle: function(func, limit) {
+        let inThrottle;
+        return function(...args) {
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
     }
 }; 

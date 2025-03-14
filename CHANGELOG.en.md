@@ -2,9 +2,17 @@
 
 This document records all significant changes to the Markdown Editor.
 
+## [v1.1.0] - 2025-03-15
+
+### New Features
+- Added Chinese-English bilingual interface support, switchable via language toggle button
+- Optimized auto-save button with selected/unselected state display
+- Customized language toggle button style for better user experience
+- Fixed debounce function error in line numbers module
+
 ## [v1.0.0] - 2025-03-15
 
-## 2025-03-15
+### Improvements
 - Fixed the issue of empty content in exported PDFs
 - Optimized export functionality, added export preview
 - Fixed gray vertical line issue in PDFs

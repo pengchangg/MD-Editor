@@ -146,6 +146,66 @@
     border-color: var(--accent-color);
 }
 
+/* 自动保存按钮选中状态 */
+#autosave-btn.active {
+    background-color: var(--success-color);
+    color: white;
+    border-color: var(--success-color);
+}
+
+#autosave-btn.active:hover {
+    background-color: #219653; /* 深一点的绿色 */
+    border-color: #219653;
+}
+
+/* 语言切换按钮 */
+#language-btn {
+    background-color: #4a69bd;
+    border: 1px solid #4a69bd;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+#language-btn:hover {
+    background-color: #1e3799;
+    color: white;
+    border-color: #1e3799;
+}
+
+#language-btn:active {
+    background-color: #0c2461;
+    color: white;
+    border-color: #0c2461;
+}
+
+/* 暗色主题下的语言切换按钮 */
+.dark-theme #language-btn {
+    background-color: #3742fa;
+    border-color: #3742fa;
+    color: white;
+}
+
+.dark-theme #language-btn:hover {
+    background-color: #5352ed;
+    border-color: #5352ed;
+}
+
+.dark-theme #language-btn:active {
+    background-color: #2f3542;
+    border-color: #2f3542;
+}
+
+#language-btn i {
+    font-size: 1.3rem;
+    margin-right: 0;
+}
+
+/* 主题和自动保存按钮 */
+#theme-btn, #autosave-btn, #language-btn {
+    padding: 10px 12px;
+    margin-left: 5px;
+}
+
 /* 响应式工具栏 */
 @media (max-width: 768px) {
     .toolbar {

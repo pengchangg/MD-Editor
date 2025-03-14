@@ -64,6 +64,7 @@ const Toolbar = (function() {
         if (saveBtn) saveBtn.addEventListener('click', save);
         
         // 注意：导出按钮事件已在ExportModule中绑定
+        // 注意：语言切换按钮事件已在LanguageModule中绑定
         
         console.debug('工具栏初始化完成');
     }
