@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Markdown编辑器初始化中...');
     
-    // 初始化应用配置
+    // 初始化应用配置 - 确保最先初始化
     initAppConfig();
     
     // 缓存DOM元素

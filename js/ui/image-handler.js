@@ -404,7 +404,21 @@ const ImageHandler = (function() {
             // 确保html是字符串
             if (!html || typeof html !== 'string') {
                 console.warn('processImages: 输入的HTML不是字符串:', typeof html);
-                return String(html || '');
+                // 尝试将非字符串转换为字符串
+                if (html === null) {
+                    return '';
+                } else if (html === undefined) {
+                    return '';
+                } else if (typeof html === 'object') {
+                    try {
+                        return String(html);
+                    } catch (e) {
+                        console.error('无法将对象转换为字符串:', e);
+                        return '';
+                    }
+                } else {
+                    return String(html || '');
+                }
             }
             
             console.debug('处理HTML中的图片，HTML长度:', html.length);

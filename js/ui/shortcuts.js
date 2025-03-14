@@ -8,6 +8,16 @@ const ShortcutsModule = {
     
     // 处理键盘快捷键
     handleKeyDown: function(e) {
+        // 确保 AppConfig 已定义
+        if (!window.AppConfig) {
+            console.warn('AppConfig 未定义，使用默认配置');
+            window.AppConfig = {
+                isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
+                modKey: navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? '⌘' : 'Ctrl',
+                altKey: navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? '⌥' : 'Alt'
+            };
+        }
+        
         // 获取系统信息
         const isMac = window.AppConfig.isMac;
         

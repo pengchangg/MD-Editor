@@ -77,6 +77,21 @@ const Toolbar = (function() {
     
     // 更新按钮的tooltip属性
     function updateButtonTooltips() {
+        // 确保 AppConfig 已定义
+        if (!window.AppConfig) {
+            console.warn('AppConfig 未定义，使用默认配置');
+            // 创建一个临时的AppConfig对象
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            window.AppConfig = {
+                isMac: isMac,
+                modKey: isMac ? '⌘' : 'Ctrl',
+                altKey: isMac ? '⌥' : 'Alt',
+                AUTO_SAVE_DELAY: 30000,
+                MAX_HISTORY_STATES: 100,
+                PERFORMANCE_SAMPLE_RATE: 0.1
+            };
+        }
+        
         const modKey = window.AppConfig.modKey;
         
         // 更新各个按钮的tooltip，添加快捷键信息

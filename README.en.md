@@ -27,6 +27,10 @@ English | [中文](README.md)
   - Improved PDF export with better document formatting preservation
   - Multiple PDF export methods to ensure functionality in different environments
   - Prevention of duplicate exports to avoid generating multiple identical files
+- **Automated Build and Release**:
+  - Automatic build and release using GitHub Actions
+  - Build process triggered automatically when new tags are created
+  - Built artifacts automatically published to GitHub Releases
 
 For detailed information about all updates, please check the [Changelog](CHANGELOG.en.md) ([中文](CHANGELOG.md)).
 
@@ -39,6 +43,7 @@ For detailed information about all updates, please check the [Changelog](CHANGEL
 - [html2canvas](https://html2canvas.hertzen.com/) and [jsPDF](https://github.com/parallax/jsPDF) for PDF export
 - [Font Awesome](https://fontawesome.com/) for icons
 - Custom font: [LXGW WenKai](https://github.com/lxgw/LxgwWenKai)
+- [GitHub Actions](https://github.com/features/actions) for automated build and release
 
 ## Deployment Guide
 
@@ -117,6 +122,65 @@ The editor uses the browser's localStorage to store the following information:
 ## License
 
 [MIT](LICENSE)
+
+## Resource Localization Build Tool
+
+This project includes a resource localization build tool that can download all external resources locally, compress them, and replace references.
+
+### Features
+
+- Download all external network resources (JS, CSS, images, fonts, etc.) locally
+- Compress JS and CSS files
+- Compress font files (TTF/OTF to WOFF2)
+- Replace resource references in HTML files with local paths
+- Process URL references in CSS files
+- Organize all resources into the dist directory
+
+### Usage
+
+1. Install dependencies:
+
+```bash
+yarn install
+```
+
+2. Run the build script:
+
+```bash
+yarn build
+```
+
+Or run directly:
+
+```bash
+node build.js
+```
+
+3. After building, all resources will be saved to the `dist` directory, ready for deployment.
+
+### Automated Release
+
+The project uses GitHub Actions for automated build and release. For detailed release process, please refer to the [Release Guide](RELEASE_GUIDE.md).
+
+### Directory Structure
+
+The directory structure after building is as follows:
+
+```
+dist/
+├── assets/
+│   ├── css/      # CSS files
+│   ├── js/       # JS files
+│   ├── fonts/    # Font files
+│   └── images/   # Image files
+└── *.html        # HTML files
+```
+
+### Notes
+
+- The build process will clear the dist directory, so make sure not to put important files there
+- If you encounter download failures, check your network connection or if the resource URL is valid
+- For dynamically loaded resources, manual handling may be required
 
 ## Contributing
 

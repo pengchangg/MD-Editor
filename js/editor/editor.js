@@ -263,19 +263,24 @@ const Editor = (function() {
                     // 调试信息
                     console.debug('处理图片前的HTML类型:', typeof html);
                     
-                    const processedHtml = ImageHandler.processImages(html);
-                    
-                    // 确保处理后的结果是字符串
-                    if (typeof processedHtml === 'string') {
-                        html = processedHtml;
-                    } else {
-                        console.error('processImages返回的不是字符串:', 
-                            processedHtml === null ? 'null' : 
-                            processedHtml === undefined ? 'undefined' : 
-                            typeof processedHtml);
+                    // 确保html是字符串后再传递给processImages
+                    if (typeof html === 'string') {
+                        const processedHtml = ImageHandler.processImages(html);
                         
-                        // 如果处理结果不是字符串，使用原始HTML
-                        console.debug('使用原始HTML');
+                        // 确保处理后的结果是字符串
+                        if (typeof processedHtml === 'string') {
+                            html = processedHtml;
+                        } else {
+                            console.error('processImages返回的不是字符串:', 
+                                processedHtml === null ? 'null' : 
+                                processedHtml === undefined ? 'undefined' : 
+                                typeof processedHtml);
+                            
+                            // 如果处理结果不是字符串，使用原始HTML
+                            console.debug('使用原始HTML');
+                        }
+                    } else {
+                        console.error('无法将HTML转换为字符串，跳过图片处理');
                     }
                 } catch (error) {
                     console.error('图片处理错误:', error);
