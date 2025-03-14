@@ -1,0 +1,69 @@
+name: 构建并发布Release
+
+on:
+  push:
+    tags:
+      - 'v*' # 当推送以v开头的标签时触发，例如v1.0.0
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+      
+      - name: 设置Node.js环境
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      
+      - name: 安装依赖
+        run: npm ci
+      
+      - name: 运行构建脚本
+        run: node build.js
+      
+      - name: 打包dist目录
+        run: |
+          cd dist
+          zip -r ../md-editor-vanilla-${{ github.ref_name }}.zip .
+          cd ..
+      
+      - name: 获取版本号
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+      - name: 创建Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: Markdown编辑器 ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            md-editor-vanilla-${{ github.ref_name }}.zip
+          body: |
+            # Markdown编辑器 ${{ github.ref_name }} 发布
+            
+            这是Markdown编辑器的优化构建版本，所有代码已经过压缩和优化。
+            
+            ## 使用方法
+            
+            1. 下载并解压 `md-editor-vanilla-${{ github.ref_name }}.zip` 文件
+            2. 直接在浏览器中打开 `index.html` 文件
+            3. 或者通过HTTP服务器提供服务（推荐）:
+               - 使用Node.js: `npx serve` 或 `npx http-server`
+               - 使用Python: `python -m http.server`
+            
+            ## 构建信息
+            
+            构建时间: ${{ github.event.repository.updated_at }}
+            
+            ## 更新内容
+            
+            - 请在此处添加版本更新内容
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

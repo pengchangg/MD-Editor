@@ -28,6 +28,10 @@
   - 改进的PDF导出，更好地保留文档格式
   - 多种PDF导出方式，确保在不同环境下都能正常工作
   - 防止重复导出，避免生成多个相同文件
+- **自动构建与发布**：
+  - 使用GitHub Actions自动构建和发布新版本
+  - 每次创建新标签时自动触发构建流程
+  - 自动将构建产物发布到GitHub Release中
 
 有关所有更新的详细信息，请查看[更新日志](CHANGELOG.md) ([English](CHANGELOG.en.md))。
 
@@ -40,6 +44,7 @@
 - 使用[html2canvas](https://html2canvas.hertzen.com/)和[jsPDF](https://github.com/parallax/jsPDF)实现PDF导出
 - 使用[Font Awesome](https://fontawesome.com/)提供图标支持
 - 自定义字体：[LXGW WenKai](https://github.com/lxgw/LxgwWenKai)
+- 使用[GitHub Actions](https://github.com/features/actions)实现自动构建和发布
 
 ## 部署说明
 
@@ -118,3 +123,62 @@
 ## 许可证
 
 [MIT](LICENSE)
+
+## 资源本地化构建工具
+
+这个项目包含一个资源本地化构建工具，可以将所有外部资源下载到本地，并进行压缩和引用替换。
+
+### 功能
+
+- 下载所有外部网络资源（JS、CSS、图片、字体等）到本地
+- 压缩JS和CSS文件
+- 压缩字体文件（TTF/OTF转WOFF2）
+- 替换HTML文件中的资源引用为本地路径
+- 处理CSS文件中的URL引用
+- 将所有资源整理到dist目录中
+
+### 使用方法
+
+1. 安装依赖：
+
+```bash
+yarn install
+```
+
+2. 运行构建脚本：
+
+```bash
+yarn build
+```
+
+或者直接运行：
+
+```bash
+node build.js
+```
+
+3. 构建完成后，所有资源将被保存到`dist`目录中，可以直接部署使用。
+
+### 自动发布
+
+项目使用GitHub Actions自动构建和发布新版本。详细的发布流程请参考[发布指南](RELEASE_GUIDE.md)。
+
+### 目录结构
+
+构建后的目录结构如下：
+
+```
+dist/
+├── assets/
+│   ├── css/      # CSS文件
+│   ├── js/       # JS文件
+│   ├── fonts/    # 字体文件
+│   └── images/   # 图片文件
+└── *.html        # HTML文件
+```
+
+### 注意事项
+
+- 构建过程会清空dist目录，请确保不要将重要文件放在该目录中
+- 如果遇到下载失败的资源，请检查网络连接或资源URL是否有效
+- 对于动态加载的资源，可能需要手动处理
