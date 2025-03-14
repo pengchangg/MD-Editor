@@ -520,7 +520,7 @@ const ImageHandler = (function() {
         const result = cleanupUnusedImages(markdownText, true);
         
         if (!result.cleaned) {
-            UIUtils.showNotification('没有找到可以清理的图片', 'info');
+            UIUtils.showNotification('notification-no-images-to-cleanup', 'info');
         }
     }
     
@@ -561,9 +561,23 @@ const ImageHandler = (function() {
                     sizeText = `${freedSpaceInKB} KB`;
                 }
                 
-                const message = isManual 
-                    ? `已手动清理 ${cleaned} 张未使用的图片，释放了 ${sizeText} 空间`
-                    : `已清理 ${cleaned} 张未使用的图片，释放了 ${sizeText} 空间`;
+                // 使用翻译键并替换参数
+                const notificationKey = isManual 
+                    ? 'notification-manual-cleanup-success'
+                    : 'notification-auto-cleanup-success';
+                
+                // 获取翻译文本
+                let message = notificationKey;
+                if (typeof LanguageModule !== 'undefined' && LanguageModule.getTranslation) {
+                    message = LanguageModule.getTranslation(notificationKey);
+                    // 替换参数
+                    message = message.replace('{0}', cleaned).replace('{1}', sizeText);
+                } else {
+                    // 如果没有语言模块，使用默认消息
+                    message = isManual 
+                        ? `已手动清理 ${cleaned} 张未使用的图片，释放了 ${sizeText} 空间`
+                        : `已清理 ${cleaned} 张未使用的图片，释放了 ${sizeText} 空间`;
+                }
                 
                 UIUtils.showNotification(message, 'info');
             } catch (e) {

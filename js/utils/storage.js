@@ -43,9 +43,9 @@ const Storage = (function() {
         if (savedContent) {
             editor.value = savedContent;
             lastSavedContent = savedContent;
-            updateSaveStatus('已加载');
+            updateSaveStatus('status-loaded');
             setTimeout(() => {
-                updateSaveStatus('已保存');
+                updateSaveStatus('status-saved');
             }, 2000);
             
             // 如果有图片处理模块，验证图片
@@ -63,8 +63,8 @@ const Storage = (function() {
         try {
             localStorage.setItem('md_editor_content', editor.value);
             lastSavedContent = editor.value;
-            updateSaveStatus('已保存');
-            UIUtils.showNotification('文档已保存', 'success');
+            updateSaveStatus('status-saved');
+            UIUtils.showNotification('notification-document-saved', 'success');
             updateStorageInfo();
             
             // 如果有图片处理模块，确保图片数据已保存
@@ -77,14 +77,14 @@ const Storage = (function() {
                     ImageHandler.validateImages();
                 } catch (imgError) {
                     console.error('处理图片数据时出错:', imgError);
-                    UIUtils.showNotification('图片数据处理失败，但文档已保存', 'warning');
+                    UIUtils.showNotification('notification-image-processing-failed', 'warning');
                 }
             }
             
             return true;
         } catch (e) {
             console.error('保存到localStorage失败:', e);
-            UIUtils.showNotification('保存失败，可能是存储空间不足', 'error');
+            UIUtils.showNotification('notification-save-failed', 'error');
             return false;
         }
     }
@@ -92,24 +92,30 @@ const Storage = (function() {
     // 标记为未保存
     function markUnsaved() {
         if (editor.value !== lastSavedContent) {
-            updateSaveStatus('未保存');
+            updateSaveStatus('status-unsaved');
         } else {
-            updateSaveStatus('已保存');
+            updateSaveStatus('status-saved');
         }
     }
     
     // 更新保存状态显示
-    function updateSaveStatus(status) {
-        saveStatus.textContent = status;
+    function updateSaveStatus(statusKey) {
+        // 获取翻译后的状态文本
+        let statusText = statusKey;
+        if (typeof LanguageModule !== 'undefined' && LanguageModule.getTranslation) {
+            statusText = LanguageModule.getTranslation(statusKey);
+        }
+        
+        saveStatus.textContent = statusText;
         
         // 根据状态设置样式
-        if (status === '已保存') {
+        if (statusKey === 'status-saved') {
             saveStatus.classList.remove('unsaved');
             saveStatus.classList.add('saved');
-        } else if (status === '未保存') {
+        } else if (statusKey === 'status-unsaved') {
             saveStatus.classList.remove('saved');
             saveStatus.classList.add('unsaved');
-        } else if (status === '已加载') {
+        } else if (statusKey === 'status-loaded') {
             saveStatus.classList.remove('unsaved');
             saveStatus.classList.add('loaded');
         }
@@ -133,10 +139,10 @@ const Storage = (function() {
         
         if (autosaveEnabled) {
             startAutosave();
-            UIUtils.showNotification('已开启自动保存', 'info');
+            UIUtils.showNotification('notification-autosave-enabled', 'info');
         } else {
             stopAutosave();
-            UIUtils.showNotification('已关闭自动保存', 'info');
+            UIUtils.showNotification('notification-autosave-disabled', 'info');
         }
         
         updateAutosaveStatus();
@@ -152,7 +158,7 @@ const Storage = (function() {
             if (editor.value !== lastSavedContent) {
                 const saved = saveContent();
                 if (saved) {
-                    UIUtils.showNotification('文档已自动保存', 'info');
+                    UIUtils.showNotification('notification-document-autosaved', 'info');
                 }
             }
         }, AUTOSAVE_INTERVAL);

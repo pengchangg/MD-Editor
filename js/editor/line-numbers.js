@@ -7,6 +7,14 @@ const LineNumbersModule = {
         
         // 监听编辑器滚动事件，更新行号
         window.AppElements.editor.addEventListener('scroll', this.handleEditorScroll.bind(this));
+        
+        // 监听光标位置变化事件
+        const editor = window.AppElements.editor;
+        editor.addEventListener('click', this.updateLineNumbers.bind(this));
+        editor.addEventListener('keyup', this.updateLineNumbers.bind(this));
+        editor.addEventListener('mouseup', this.updateLineNumbers.bind(this));
+        editor.addEventListener('select', this.updateLineNumbers.bind(this));
+        editor.addEventListener('selectionchange', this.updateLineNumbers.bind(this));
     },
     
     // 处理编辑器滚动事件
@@ -47,6 +55,7 @@ const LineNumbersModule = {
             const lineDiv = document.createElement('div');
             lineDiv.textContent = i;
             lineDiv.className = 'line-number';
+            lineDiv.setAttribute('data-line', i);
 
             // 高亮当前行号
             if (i === currentLineNumber) {
@@ -59,7 +68,12 @@ const LineNumbersModule = {
         // 更新光标位置信息
         const currentLine = lines[currentLineNumber - 1] || '';
         const column = cursorPos - (charCount - currentLine.length - 1);
-        cursorPosition.textContent = `行: ${currentLineNumber}, 列: ${column}`;
+        
+        // 更新状态栏中的行列信息
+        const linePos = document.getElementById('line-pos');
+        const colPos = document.getElementById('col-pos');
+        if (linePos) linePos.textContent = currentLineNumber;
+        if (colPos) colPos.textContent = column;
         
         const endTime = performance.now();
         PerformanceModule.recordMetric('lineNumberUpdateTime', endTime - startTime);

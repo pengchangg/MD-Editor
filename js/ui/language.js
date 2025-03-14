@@ -42,6 +42,24 @@ const LanguageModule = (function() {
         'storage-info-label': { zh: '占用空间:', en: 'Storage:' },
         'cleanup-images-btn': { zh: '清理未使用的图片', en: 'Clean Unused Images' },
         
+        // 保存状态
+        'status-saved': { zh: '已保存', en: 'Saved' },
+        'status-unsaved': { zh: '未保存', en: 'Unsaved' },
+        'status-loaded': { zh: '已加载', en: 'Loaded' },
+        
+        // 通知消息
+        'notification-document-saved': { zh: '文档已保存', en: 'Document saved' },
+        'notification-document-autosaved': { zh: '文档已自动保存', en: 'Document auto-saved' },
+        'notification-autosave-enabled': { zh: '已开启自动保存', en: 'Auto save enabled' },
+        'notification-autosave-disabled': { zh: '已关闭自动保存', en: 'Auto save disabled' },
+        'notification-save-failed': { zh: '保存失败，可能是存储空间不足', en: 'Save failed, storage may be full' },
+        'notification-image-processing-failed': { zh: '图片数据处理失败，但文档已保存', en: 'Image processing failed, but document saved' },
+        'notification-language-changed-zh': { zh: '已切换到中文', en: 'Switched to Chinese' },
+        'notification-language-changed-en': { zh: '已切换到英文', en: 'Switched to English' },
+        'notification-no-images-to-cleanup': { zh: '没有找到可以清理的图片', en: 'No images found to clean up' },
+        'notification-manual-cleanup-success': { zh: '已手动清理 {0} 张未使用的图片，释放了 {1} 空间', en: 'Manually cleaned up {0} unused images, freed {1} space' },
+        'notification-auto-cleanup-success': { zh: '已清理 {0} 张未使用的图片，释放了 {1} 空间', en: 'Cleaned up {0} unused images, freed {1} space' },
+        
         // 编辑器占位符
         'editor-placeholder': { zh: '请输入 Markdown 文本...', en: 'Enter Markdown text...' },
         
@@ -58,11 +76,6 @@ const LanguageModule = (function() {
         'export-filename-label': { zh: '文件名:', en: 'Filename:' },
         'confirm-export-btn': { zh: '确认导出', en: 'Confirm Export' },
         'cancel-export-btn': { zh: '取消', en: 'Cancel' },
-        
-        // 通知
-        'saved-notification': { zh: '文档已保存', en: 'Document saved' },
-        'autosave-on-notification': { zh: '自动保存已开启', en: 'Auto save enabled' },
-        'autosave-off-notification': { zh: '自动保存已关闭', en: 'Auto save disabled' },
         
         // 示例文本
         'welcome-text': {
@@ -177,15 +190,41 @@ console.log('Hello, Markdown!');
             languageBtn.title = currentLanguage === 'zh' ? '切换到英文' : 'Switch to Chinese';
         }
         
+        // 检查是否需要更新示例文本
+        const editor = document.getElementById('editor');
+        if (editor) {
+            // 检查当前内容是否是默认示例文本
+            const zhWelcomeText = translations['welcome-text']['zh'];
+            const enWelcomeText = translations['welcome-text']['en'];
+            
+            // 如果当前内容是其中一种语言的示例文本，则更新为当前语言的示例文本
+            if (editor.value === zhWelcomeText || editor.value === enWelcomeText) {
+                editor.value = translations['welcome-text'][currentLanguage];
+                
+                // 更新预览和行号
+                if (typeof Editor !== 'undefined') {
+                    Editor.updatePreview();
+                }
+                if (typeof LineNumbersModule !== 'undefined') {
+                    LineNumbersModule.updateLineNumbers();
+                }
+            }
+        }
+        
         // 显示通知
-        const message = currentLanguage === 'zh' ? '已切换到中文' : 'Switched to English';
-        UIUtils.showNotification(message, 3000);
+        const notificationKey = currentLanguage === 'zh' ? 'notification-language-changed-zh' : 'notification-language-changed-en';
+        UIUtils.showNotification(notificationKey, 3000);
     }
     
     // 应用语言
     function applyLanguage() {
         // 更新工具栏按钮标题
         updateToolbarTitles();
+        
+        // 更新工具栏按钮提示文本
+        if (typeof Toolbar !== 'undefined' && Toolbar.updateButtonTooltips) {
+            Toolbar.updateButtonTooltips();
+        }
         
         // 更新状态栏文本
         updateStatusBarText();
@@ -268,7 +307,9 @@ console.log('Hello, Markdown!');
         // 清理图片按钮
         const cleanupBtn = document.getElementById('cleanup-images-btn');
         if (cleanupBtn) {
-            cleanupBtn.title = translations['cleanup-images-btn'][currentLanguage];
+            // 不再设置title属性，由toolbar.js中的updateButtonTooltips函数处理
+            // cleanupBtn.title = translations['cleanup-images-btn'][currentLanguage];
+            cleanupBtn.setAttribute('data-tooltip', translations['cleanup-images-btn'][currentLanguage]);
         }
     }
     

@@ -47,6 +47,9 @@ const Toolbar = (function() {
             'saveBtn': !!saveBtn
         });
         
+        // 更新按钮的tooltip属性
+        updateButtonTooltips();
+        
         // 绑定按钮事件
         if (boldBtn) boldBtn.addEventListener('click', () => wrapText('**', '**'));
         if (italicBtn) italicBtn.addEventListener('click', () => wrapText('*', '*'));
@@ -63,10 +66,171 @@ const Toolbar = (function() {
         if (redoBtn) redoBtn.addEventListener('click', redo);
         if (saveBtn) saveBtn.addEventListener('click', save);
         
+        // 设置智能tooltip定位
+        setupSmartTooltips();
+        
         // 注意：导出按钮事件已在ExportModule中绑定
         // 注意：语言切换按钮事件已在LanguageModule中绑定
         
         console.debug('工具栏初始化完成');
+    }
+    
+    // 更新按钮的tooltip属性
+    function updateButtonTooltips() {
+        const modKey = window.AppConfig.modKey;
+        
+        // 更新各个按钮的tooltip，添加快捷键信息
+        if (boldBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('bold-btn')} (${modKey}+B)` : 
+                `粗体 (${modKey}+B)`;
+            boldBtn.setAttribute('data-tooltip', tooltipText);
+            boldBtn.title = ''; // 清除原生title
+        }
+        if (italicBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('italic-btn')} (${modKey}+I)` : 
+                `斜体 (${modKey}+I)`;
+            italicBtn.setAttribute('data-tooltip', tooltipText);
+            italicBtn.title = '';
+        }
+        if (headingBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('heading-btn')} (${modKey}+1~6)` : 
+                `标题 (${modKey}+1~6)`;
+            headingBtn.setAttribute('data-tooltip', tooltipText);
+            headingBtn.title = '';
+        }
+        if (linkBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('link-btn')} (${modKey}+K)` : 
+                `链接 (${modKey}+K)`;
+            linkBtn.setAttribute('data-tooltip', tooltipText);
+            linkBtn.title = '';
+        }
+        if (imageBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('image-btn')} (${modKey}+Shift+I)` : 
+                `图片 (${modKey}+Shift+I)`;
+            imageBtn.setAttribute('data-tooltip', tooltipText);
+            imageBtn.title = '';
+        }
+        if (listBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('list-btn')} (${modKey}+Shift+L)` : 
+                `无序列表 (${modKey}+Shift+L)`;
+            listBtn.setAttribute('data-tooltip', tooltipText);
+            listBtn.title = '';
+        }
+        if (orderedListBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('ordered-list-btn')} (${modKey}+Shift+O)` : 
+                `有序列表 (${modKey}+Shift+O)`;
+            orderedListBtn.setAttribute('data-tooltip', tooltipText);
+            orderedListBtn.title = '';
+        }
+        if (quoteBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('quote-btn')} (${modKey}+Shift+B)` : 
+                `引用 (${modKey}+Shift+B)`;
+            quoteBtn.setAttribute('data-tooltip', tooltipText);
+            quoteBtn.title = '';
+        }
+        if (codeBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('code-btn')} (${modKey}+Shift+C)` : 
+                `代码块 (${modKey}+Shift+C)`;
+            codeBtn.setAttribute('data-tooltip', tooltipText);
+            codeBtn.title = '';
+        }
+        if (tableBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('table-btn')} (${modKey}+Shift+T)` : 
+                `表格 (${modKey}+Shift+T)`;
+            tableBtn.setAttribute('data-tooltip', tooltipText);
+            tableBtn.title = '';
+        }
+        if (helpBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                LanguageModule.getTranslation('help-btn') : 
+                '快捷键帮助';
+            helpBtn.setAttribute('data-tooltip', tooltipText);
+            helpBtn.title = '';
+        }
+        if (undoBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('undo-btn')}` : 
+                `撤销 (${modKey}+Z)`;
+            undoBtn.setAttribute('data-tooltip', tooltipText);
+            undoBtn.title = '';
+        }
+        if (redoBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('redo-btn')}` : 
+                `重做 (${modKey}+Y 或 ${modKey}+Shift+Z)`;
+            redoBtn.setAttribute('data-tooltip', tooltipText);
+            redoBtn.title = '';
+        }
+        if (saveBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                `${LanguageModule.getTranslation('save-btn')}` : 
+                `保存 (${modKey}+S)`;
+            saveBtn.setAttribute('data-tooltip', tooltipText);
+            saveBtn.title = '';
+        }
+        
+        // 其他按钮的tooltip设置
+        const exportBtn = document.getElementById('export-btn');
+        const autosaveBtn = document.getElementById('autosave-btn');
+        const languageBtn = document.getElementById('language-btn');
+        const themeBtn = document.getElementById('theme-btn');
+        const exportMdBtn = document.getElementById('export-md-btn');
+        const exportPdfBtn = document.getElementById('export-pdf-btn');
+        const cleanupImagesBtn = document.getElementById('cleanup-images-btn');
+        
+        if (exportBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                LanguageModule.getTranslation('export-btn') : 
+                '导出文档';
+            exportBtn.setAttribute('data-tooltip', tooltipText);
+        }
+        if (autosaveBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                LanguageModule.getTranslation('autosave-btn') : 
+                '自动保存';
+            autosaveBtn.setAttribute('data-tooltip', tooltipText);
+        }
+        if (languageBtn) {
+            const currentLanguage = typeof LanguageModule !== 'undefined' && LanguageModule.getCurrentLanguage ? 
+                LanguageModule.getCurrentLanguage() : 'zh';
+            const tooltipText = currentLanguage === 'zh' ? '切换到英文' : 'Switch to Chinese';
+            languageBtn.setAttribute('data-tooltip', tooltipText);
+        }
+        if (themeBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                LanguageModule.getTranslation('theme-btn') : 
+                '切换主题 (浅色/深色)';
+            themeBtn.setAttribute('data-tooltip', tooltipText);
+        }
+        if (exportMdBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                LanguageModule.getTranslation('export-md-btn') : 
+                '导出为Markdown文件';
+            exportMdBtn.setAttribute('data-tooltip', tooltipText);
+        }
+        if (exportPdfBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                LanguageModule.getTranslation('export-pdf-btn') : 
+                '导出为PDF文件';
+            exportPdfBtn.setAttribute('data-tooltip', tooltipText);
+        }
+        if (cleanupImagesBtn) {
+            const tooltipText = typeof LanguageModule !== 'undefined' ? 
+                LanguageModule.getTranslation('cleanup-images-btn') : 
+                '清理未使用的图片';
+            cleanupImagesBtn.setAttribute('data-tooltip', tooltipText);
+            cleanupImagesBtn.title = ''; // 清除原生title
+        }
     }
     
     // 包装文本
@@ -336,9 +500,107 @@ const Toolbar = (function() {
         editor.dispatchEvent(event);
     }
     
+    // 设置智能tooltip定位
+    function setupSmartTooltips() {
+        // 获取所有工具栏按钮
+        const toolbarButtons = document.querySelectorAll('.toolbar button');
+        
+        // 为每个按钮添加鼠标悬停事件
+        toolbarButtons.forEach(button => {
+            button.addEventListener('mouseenter', adjustTooltipPosition);
+        });
+        
+        // 获取所有下拉菜单按钮
+        const dropdownButtons = document.querySelectorAll('.dropdown-content button');
+        
+        // 为每个下拉菜单按钮添加鼠标悬停事件
+        dropdownButtons.forEach(button => {
+            button.addEventListener('mouseenter', adjustDropdownTooltipPosition);
+        });
+    }
+    
+    // 调整tooltip位置，确保不超出屏幕边界
+    function adjustTooltipPosition(event) {
+        const button = event.currentTarget;
+        const tooltip = button.getAttribute('data-tooltip');
+        
+        if (!tooltip) return;
+        
+        // 创建一个临时元素来测量tooltip的宽度
+        const tempElement = document.createElement('div');
+        tempElement.style.position = 'absolute';
+        tempElement.style.visibility = 'hidden';
+        tempElement.style.whiteSpace = 'nowrap';
+        tempElement.style.fontSize = '0.85rem';
+        tempElement.style.padding = '6px 12px';
+        tempElement.innerText = tooltip;
+        document.body.appendChild(tempElement);
+        
+        // 获取tooltip的宽度
+        const tooltipWidth = tempElement.offsetWidth;
+        
+        // 获取按钮的位置信息
+        const buttonRect = button.getBoundingClientRect();
+        
+        // 计算tooltip的左边界位置
+        const tooltipLeft = buttonRect.left + (buttonRect.width / 2) - (tooltipWidth / 2);
+        
+        // 检查tooltip是否会超出屏幕左边界
+        if (tooltipLeft < 10) {
+            button.classList.add('tooltip-left-align');
+        } 
+        // 检查tooltip是否会超出屏幕右边界
+        else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+            button.classList.add('tooltip-right-align');
+        }
+        // 如果不会超出边界，移除可能存在的对齐类
+        else {
+            button.classList.remove('tooltip-left-align');
+            button.classList.remove('tooltip-right-align');
+        }
+        
+        // 移除临时元素
+        document.body.removeChild(tempElement);
+    }
+    
+    // 调整下拉菜单tooltip位置
+    function adjustDropdownTooltipPosition(event) {
+        const button = event.currentTarget;
+        const tooltip = button.getAttribute('data-tooltip');
+        
+        if (!tooltip) return;
+        
+        // 创建一个临时元素来测量tooltip的宽度
+        const tempElement = document.createElement('div');
+        tempElement.style.position = 'absolute';
+        tempElement.style.visibility = 'hidden';
+        tempElement.style.whiteSpace = 'nowrap';
+        tempElement.style.fontSize = '0.85rem';
+        tempElement.style.padding = '6px 12px';
+        tempElement.innerText = tooltip;
+        document.body.appendChild(tempElement);
+        
+        // 获取tooltip的宽度
+        const tooltipWidth = tempElement.offsetWidth;
+        
+        // 获取按钮的位置信息
+        const buttonRect = button.getBoundingClientRect();
+        
+        // 检查右侧是否有足够空间显示tooltip
+        if (buttonRect.right + tooltipWidth + 20 > window.innerWidth) {
+            button.classList.add('tooltip-left-side');
+        } else {
+            button.classList.remove('tooltip-left-side');
+        }
+        
+        // 移除临时元素
+        document.body.removeChild(tempElement);
+    }
+    
     // 公开API
     return {
-        init
+        init,
+        updateButtonTooltips
     };
 })();
 

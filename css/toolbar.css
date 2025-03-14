@@ -24,6 +24,85 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    position: relative; /* 添加相对定位，用于自定义tooltip */
+}
+
+/* 自定义tooltip样式 */
+.toolbar button::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s ease, visibility 0.1s ease;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-weight: normal;
+    letter-spacing: 0.5px;
+    max-width: 300px;
+    text-align: center;
+}
+
+/* 添加小三角形指示 */
+.toolbar button::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s ease, visibility 0.1s ease;
+    pointer-events: none;
+}
+
+/* 右侧按钮的tooltip向左偏移 */
+.toolbar button:nth-last-child(-n+4)::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+}
+
+/* 右侧按钮的小三角形也要向左偏移 */
+.toolbar button:nth-last-child(-n+4)::before {
+    left: auto;
+    right: 10px;
+    transform: translateX(0);
+}
+
+/* 左侧按钮的tooltip向右偏移 */
+.toolbar button:nth-child(-n+3)::after {
+    left: 0;
+    transform: translateX(0);
+}
+
+/* 左侧按钮的小三角形也要向右偏移 */
+.toolbar button:nth-child(-n+3)::before {
+    left: 10px;
+    transform: translateX(0);
+}
+
+.toolbar button:hover::after,
+.toolbar button:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 确保原生tooltip不显示 */
+.toolbar button {
+    pointer-events: auto;
 }
 
 .toolbar button:hover {
@@ -98,6 +177,43 @@
     border: none;
     border-bottom: 1px solid var(--border-color);
     cursor: pointer;
+    position: relative; /* 添加相对定位，用于自定义tooltip */
+}
+
+/* 下拉菜单按钮的tooltip位置调整 */
+.dropdown-content button::after {
+    bottom: auto;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    margin-left: 10px;
+}
+
+/* 下拉菜单按钮的小三角形指示调整 */
+.dropdown-content button::before {
+    bottom: auto;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    margin-left: 5px;
+    border-color: transparent transparent transparent rgba(0, 0, 0, 0.85);
+}
+
+/* 当下拉菜单靠近右侧边缘时，向左显示tooltip */
+.dropdown-content button:hover::after {
+    left: auto;
+    right: 100%;
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+/* 当下拉菜单靠近右侧边缘时，向左显示小三角形 */
+.dropdown-content button:hover::before {
+    left: auto;
+    right: 100%;
+    margin-left: 0;
+    margin-right: 5px;
+    border-color: transparent rgba(0, 0, 0, 0.85) transparent transparent;
 }
 
 .dropdown-content button:last-child {
@@ -206,6 +322,27 @@
     margin-left: 5px;
 }
 
+/* 暗色主题下的tooltip样式调整 */
+.dark-theme .toolbar button::after,
+.dark-theme .dropdown-content button::after {
+    background-color: rgba(255, 255, 255, 0.85);
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.dark-theme .toolbar button::before {
+    border-color: transparent transparent rgba(255, 255, 255, 0.85) transparent;
+}
+
+.dark-theme .dropdown-content button::before {
+    border-color: transparent transparent transparent rgba(255, 255, 255, 0.85);
+}
+
+/* 暗色主题下下拉菜单靠近右侧边缘时的样式 */
+.dark-theme .dropdown-content button:hover::before {
+    border-color: transparent rgba(255, 255, 255, 0.85) transparent transparent;
+}
+
 /* 响应式工具栏 */
 @media (max-width: 768px) {
     .toolbar {
@@ -221,4 +358,48 @@
     .toolbar button i {
         font-size: 1.1rem;
     }
+}
+
+/* 工具栏按钮的智能tooltip定位 */
+.toolbar button.tooltip-left-align::after {
+    left: 0;
+    transform: translateX(0);
+}
+
+.toolbar button.tooltip-left-align::before {
+    left: 10px;
+    transform: translateX(0);
+}
+
+.toolbar button.tooltip-right-align::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+}
+
+.toolbar button.tooltip-right-align::before {
+    left: auto;
+    right: 10px;
+    transform: translateX(0);
+}
+
+/* 下拉菜单按钮的智能tooltip定位 */
+.dropdown-content button.tooltip-left-side::after {
+    left: auto;
+    right: 100%;
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+.dropdown-content button.tooltip-left-side::before {
+    left: auto;
+    right: 100%;
+    margin-left: 0;
+    margin-right: 5px;
+    border-color: transparent rgba(0, 0, 0, 0.85) transparent transparent;
+}
+
+/* 暗色主题下的智能tooltip定位 */
+.dark-theme .dropdown-content button.tooltip-left-side::before {
+    border-color: transparent rgba(255, 255, 255, 0.85) transparent transparent;
 } 

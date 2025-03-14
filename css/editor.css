@@ -31,7 +31,8 @@
     color: inherit;
 }
 
-.line-number.active {
+.line-number.active,
+.line-number.active-line {
     background-color: var(--active-line-bg);
     color: var(--text-color);
     font-weight: bold;

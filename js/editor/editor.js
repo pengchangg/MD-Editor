@@ -36,6 +36,7 @@ const Editor = (function() {
             updatePreview();
             updateLineNumbers();
             updateStatusBar();
+            updateCursorPosition();
         });
         
         // 监听编辑器滚动事件
@@ -47,6 +48,9 @@ const Editor = (function() {
         // 监听编辑器光标位置变化
         editor.addEventListener('click', updateCursorPosition);
         editor.addEventListener('keyup', updateCursorPosition);
+        editor.addEventListener('mouseup', updateCursorPosition);
+        editor.addEventListener('select', updateCursorPosition);
+        editor.addEventListener('selectionchange', updateCursorPosition);
         
         // 监听Tab键
         editor.addEventListener('keydown', function(e) {
@@ -67,6 +71,7 @@ const Editor = (function() {
                 updatePreview();
                 updateLineNumbers();
                 updateStatusBar();
+                updateCursorPosition();
             }
         });
     }
@@ -340,12 +345,13 @@ const Editor = (function() {
         // 移除所有行的高亮
         document.querySelectorAll('.line-number').forEach(line => {
             line.classList.remove('active');
+            line.classList.remove('active-line');
         });
         
         // 高亮当前行
         const currentLineElement = document.querySelector(`.line-number[data-line="${currentLine}"]`);
         if (currentLineElement) {
-            currentLineElement.classList.add('active');
+            currentLineElement.classList.add('active-line');
         }
     }
     
@@ -438,10 +444,13 @@ const Editor = (function() {
         updateStatusBar();
     }
     
-    // 公开API
+    // 返回公共API
     return {
         init,
         updatePreview,
+        updateLineNumbers,
+        updateCursorPosition,
+        updateStatusBar,
         insertText,
         wrapText,
         getContent,

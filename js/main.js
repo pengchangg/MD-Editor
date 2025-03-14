@@ -39,12 +39,37 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof LanguageModule !== 'undefined' && LanguageModule.init) {
             console.log('初始化LanguageModule');
             LanguageModule.init();
+            
+            // 在语言模块初始化后加载初始内容
+            loadInitialContent();
         } else {
             console.error('LanguageModule未定义或缺少init方法');
+            // 如果语言模块不可用，仍然加载初始内容
+            loadInitialContent();
         }
     }, 100);
 
-    // 加载初始内容
+    // 初始化编辑器状态
+    Editor.updatePreview();
+    LineNumbersModule.updateLineNumbers();
+    TitleManager.updateDocumentTitle();
+    
+    // 确保光标位置信息正确显示
+    Editor.updateCursorPosition();
+    
+    // 添加初始状态到历史记录
+    HistoryModule.addState(editor.value);
+    
+    // 显示快捷键模式提示
+    // setTimeout(() => {
+    //     UIUtils.showNotification(`当前使用${AppConfig.isMac ? 'macOS' : 'Windows/Linux'}快捷键模式: ${AppConfig.modKey}键作为修饰键`, 5000);
+    // }, 1000);
+
+    console.log('Markdown编辑器初始化完成');
+});
+
+// 加载初始内容
+function loadInitialContent() {
     const savedContent = localStorage.getItem('md_editor_content');
     if (savedContent) {
         editor.value = savedContent;
@@ -84,23 +109,12 @@ console.log('Hello, Markdown!');
 [点击访问](https://www.example.com)
 `;
         }
+        
+        // 更新预览和行号
+        Editor.updatePreview();
+        LineNumbersModule.updateLineNumbers();
     }
-
-    // 初始化编辑器状态
-    Editor.updatePreview();
-    LineNumbersModule.updateLineNumbers();
-    TitleManager.updateDocumentTitle();
-    
-    // 添加初始状态到历史记录
-    HistoryModule.addState(editor.value);
-    
-    // 显示快捷键模式提示
-    // setTimeout(() => {
-    //     UIUtils.showNotification(`当前使用${AppConfig.isMac ? 'macOS' : 'Windows/Linux'}快捷键模式: ${AppConfig.modKey}键作为修饰键`, 5000);
-    // }, 1000);
-
-    console.log('Markdown编辑器初始化完成');
-});
+}
 
 // 初始化应用配置
 function initAppConfig() {

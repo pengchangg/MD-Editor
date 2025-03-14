@@ -10,6 +10,11 @@ This document records all significant changes to the Markdown Editor.
 - Customized language toggle button style for better user experience
 - Fixed debounce function error in line numbers module
 
+### Bug Fixes
+- Fixed issue where example text wasn't updating when switching languages
+- Optimized language switching logic to ensure UI elements are correctly translated
+- Improved bilingual notification message system
+
 ## [v1.0.0] - 2025-03-15
 
 ### Improvements

@@ -181,15 +181,27 @@ function toggleClass(element, className) {
 
 // 公开API
 const UIUtils = {
-    showNotification: (message, duration = 3000, type = 'info') => {
-        // 如果存在语言模块，尝试翻译消息
-        if (typeof LanguageModule !== 'undefined' && LanguageModule.getTranslation) {
-            // 检查是否有对应的翻译键
-            const translatedMessage = LanguageModule.getTranslation(message) || message;
-            showNotification(translatedMessage, type, duration);
-        } else {
-            showNotification(message, type, duration);
+    showNotification: (message, type = 'info', duration = 3000) => {
+        // 如果第二个参数是数字，则它是持续时间
+        if (typeof type === 'number') {
+            duration = type;
+            type = 'info';
         }
+        
+        // 如果存在语言模块，尝试翻译消息
+        let translatedMessage = message;
+        
+        // 检查消息是否已经被翻译过（包含替换后的参数）
+        const isAlreadyTranslated = typeof message === 'string' && 
+            (message.includes('已') || message.includes('cleaned') || 
+             message.includes('MB') || message.includes('KB'));
+        
+        if (!isAlreadyTranslated && typeof LanguageModule !== 'undefined' && LanguageModule.getTranslation) {
+            translatedMessage = LanguageModule.getTranslation(message) || message;
+        }
+        
+        // 显示通知
+        showNotification(translatedMessage, type, duration);
     },
 
     // 隐藏通知
