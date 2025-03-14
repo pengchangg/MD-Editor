@@ -156,37 +156,64 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // 性能优化：检查行数是否变化，如果没有变化只更新高亮行
-        const currentLineCount = lineNumbers.childElementCount;
+        // 始终重新生成所有行号，确保滚动时行号正确显示
+        lineNumbers.innerHTML = '';
+        for (let i = 1; i <= lineCount; i++) {
+            const lineDiv = document.createElement('div');
+            lineDiv.textContent = i;
+            lineDiv.style.height = '1.6em'; // 确保行高一致
 
-        if (currentLineCount === lineCount) {
-            // 行数没变，只更新高亮
-            const activeLines = lineNumbers.querySelectorAll('.active-line');
-            activeLines.forEach(line => line.classList.remove('active-line'));
-
-            if (currentLineNumber <= lineCount) {
-                lineNumbers.children[currentLineNumber - 1].classList.add('active-line');
+            // 高亮当前行
+            if (i === currentLineNumber) {
+                lineDiv.classList.add('active-line');
             }
-        } else {
-            // 行数变化，重新生成所有行号
-            lineNumbers.innerHTML = '';
-            for (let i = 1; i <= lineCount; i++) {
-                const lineDiv = document.createElement('div');
-                lineDiv.textContent = i;
 
-                // 高亮当前行
-                if (i === currentLineNumber) {
-                    lineDiv.classList.add('active-line');
-                }
-
-                lineNumbers.appendChild(lineDiv);
-            }
+            lineNumbers.appendChild(lineDiv);
         }
 
         // 更新光标位置信息
         const currentLine = lines[currentLineNumber - 1] || '';
         const column = cursorPos - (charCount - currentLine.length - 1);
         cursorPosition.textContent = `行: ${currentLineNumber}, 列: ${column}`;
+
+        // 高亮编辑器中的当前行
+        highlightCurrentLineInEditor(currentLineNumber);
+    }
+
+    // 高亮编辑器中的当前行
+    function highlightCurrentLineInEditor(lineNumber) {
+        // 创建或获取高亮元素
+        let highlightElement = document.getElementById('current-line-highlight');
+        if (!highlightElement) {
+            highlightElement = document.createElement('div');
+            highlightElement.id = 'current-line-highlight';
+            editor.parentElement.appendChild(highlightElement);
+        }
+
+        // 获取行高和内边距
+        const computedStyle = window.getComputedStyle(editor);
+        const lineHeight = parseFloat(computedStyle.lineHeight);
+        const paddingTop = parseFloat(computedStyle.paddingTop);
+
+        // 计算高亮位置
+        const highlightPosition = (lineNumber - 1) * lineHeight + paddingTop;
+
+        // 设置高亮元素的样式
+        highlightElement.style.position = 'absolute';
+        highlightElement.style.left = '50px'; // 行号宽度
+        highlightElement.style.right = '0';
+        highlightElement.style.height = `${lineHeight}px`;
+        highlightElement.style.top = `${highlightPosition}px`;
+        highlightElement.style.pointerEvents = 'none';
+        highlightElement.style.zIndex = '0';
+        highlightElement.style.transform = `translateY(-${editor.scrollTop}px)`; // 确保高亮跟随滚动
+
+        // 根据主题设置不同的背景色
+        if (document.body.classList.contains('dark-theme')) {
+            highlightElement.style.backgroundColor = 'rgba(55, 100, 140, 0.9)';
+        } else {
+            highlightElement.style.backgroundColor = 'rgba(232, 244, 253, 0.9)';
+        }
     }
 
     // 实时预览功能
@@ -388,84 +415,143 @@ document.addEventListener('DOMContentLoaded', function() {
             // 如果没有找到匹配的标题，使用百分比滚动
             const percentage = editor.scrollTop / (editor.scrollHeight - editor.clientHeight || 1);
             const previewScrollPosition = percentage * (preview.scrollHeight - preview.clientHeight || 1);
-            preview.scrollTop = previewScrollPosition;
+
+            // 使用 requestAnimationFrame 确保平滑滚动
+            requestAnimationFrame(() => {
+                preview.scrollTop = previewScrollPosition;
+            });
         } else {
             // 从预览滚动到编辑器，使用百分比滚动
             const percentage = preview.scrollTop / (preview.scrollHeight - preview.clientHeight || 1);
             const editorScrollPosition = percentage * (editor.scrollHeight - editor.clientHeight || 1);
-            editor.scrollTop = editorScrollPosition;
-            lineNumbers.scrollTop = editor.scrollTop;
+
+            // 使用 requestAnimationFrame 确保平滑滚动
+            requestAnimationFrame(() => {
+                editor.scrollTop = editorScrollPosition;
+                lineNumbers.scrollTop = editor.scrollTop;
+            });
         }
     }
 
-    // 监听编辑器滚动，同步行号滚动
-    editor.addEventListener('scroll', function() {
-        // 立即同步行号滚动，这个不需要防抖
+    // 添加鼠标滚轮事件监听器
+    let wheelTimeout = null;
+
+    editor.addEventListener('wheel', function(e) {
+        // 如果是由预览区域触发的滚动，不再触发同步
+        if (isPreviewScrolling) return;
+
+        // 清除之前的超时
+        clearTimeout(wheelTimeout);
+
+        // 确保行号滚动同步
         lineNumbers.scrollTop = editor.scrollTop;
 
-        // 同步预览区域滚动，使用防抖
-        if (scrollSyncEnabled && !isPreviewScrolling) {
-            isEditorScrolling = true;
-            debouncedSyncScrollPositions(true);
-            setTimeout(() => {
-                isEditorScrolling = false;
-            }, 50);
-        }
-    });
-
-    // 监听预览区域滚动，同步编辑器滚动
-    preview.addEventListener('scroll', function() {
-        if (scrollSyncEnabled && !isEditorScrolling) {
-            isPreviewScrolling = true;
-            debouncedSyncScrollPositions(false);
-            setTimeout(() => {
-                isPreviewScrolling = false;
-            }, 50);
-        }
-    });
-
-    // 添加鼠标滚轮事件监听器
-    editor.addEventListener('wheel', function(e) {
-        // 确保行号滚动同步
-        setTimeout(() => {
-            lineNumbers.scrollTop = editor.scrollTop;
-        }, 10);
-
         // 同步预览区域滚动
-        if (scrollSyncEnabled && !isPreviewScrolling) {
+        if (scrollSyncEnabled) {
             isEditorScrolling = true;
-            // 延迟执行同步，确保编辑器已经完成滚动
-            setTimeout(() => {
-                debouncedSyncScrollPositions(true);
+
+            // 设置一个短暂的延迟，等待滚动完成
+            wheelTimeout = setTimeout(() => {
+                syncScrollPositions(true);
+
+                // 设置一个较长的冷却时间
                 setTimeout(() => {
                     isEditorScrolling = false;
-                }, 50);
-            }, 10);
+                }, 300);
+            }, 50);
         }
     }, { passive: true });
 
     preview.addEventListener('wheel', function(e) {
-        if (scrollSyncEnabled && !isEditorScrolling) {
+        // 如果是由编辑器触发的滚动，不再触发同步
+        if (isEditorScrolling) return;
+
+        // 清除之前的超时
+        clearTimeout(wheelTimeout);
+
+        if (scrollSyncEnabled) {
             isPreviewScrolling = true;
-            // 延迟执行同步，确保预览区域已经完成滚动
-            setTimeout(() => {
-                debouncedSyncScrollPositions(false);
+
+            // 设置一个短暂的延迟，等待滚动完成
+            wheelTimeout = setTimeout(() => {
+                syncScrollPositions(false);
+
+                // 设置一个较长的冷却时间
                 setTimeout(() => {
                     isPreviewScrolling = false;
-                }, 50);
-            }, 10);
+                }, 300);
+            }, 50);
         }
     }, { passive: true });
+
+    // 添加滚动事件监听器，处理滚动条拖动
+    let scrollTimeout = null;
+
+    editor.addEventListener('scroll', function() {
+        // 如果是由滚轮事件或预览区域触发的滚动，不再处理
+        if (isPreviewScrolling || wheelTimeout) return;
+
+        // 清除之前的超时
+        clearTimeout(scrollTimeout);
+
+        // 同步行号滚动
+        lineNumbers.scrollTop = editor.scrollTop;
+
+        // 同步预览区域滚动
+        if (scrollSyncEnabled) {
+            isEditorScrolling = true;
+
+            // 设置一个短暂的延迟，等待滚动完成
+            scrollTimeout = setTimeout(() => {
+                syncScrollPositions(true);
+
+                // 设置一个较长的冷却时间
+                setTimeout(() => {
+                    isEditorScrolling = false;
+                }, 300);
+            }, 50);
+        }
+    });
+
+    preview.addEventListener('scroll', function() {
+        // 如果是由滚轮事件或编辑器触发的滚动，不再处理
+        if (isEditorScrolling || wheelTimeout) return;
+
+        // 清除之前的超时
+        clearTimeout(scrollTimeout);
+
+        // 同步编辑器滚动
+        if (scrollSyncEnabled) {
+            isPreviewScrolling = true;
+
+            // 设置一个短暂的延迟，等待滚动完成
+            scrollTimeout = setTimeout(() => {
+                syncScrollPositions(false);
+
+                // 设置一个较长的冷却时间
+                setTimeout(() => {
+                    isPreviewScrolling = false;
+                }, 300);
+            }, 50);
+        }
+    });
 
     // 监听编辑器光标位置变化
     editor.addEventListener('click', updateLineNumbers);
     editor.addEventListener('keyup', function(e) {
-        // 只在光标移动时更新行号，避免在每次按键时都更新
-        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' ||
-            e.key === 'ArrowLeft' || e.key === 'ArrowRight' ||
-            e.key === 'Home' || e.key === 'End' ||
-            e.key === 'PageUp' || e.key === 'PageDown') {
-            updateLineNumbers();
+        // 更新行号和高亮
+        updateLineNumbers();
+    });
+
+    // 监听编辑器滚动，确保高亮行跟随滚动
+    editor.addEventListener('scroll', function() {
+        // 更新行号滚动
+        lineNumbers.scrollTop = editor.scrollTop;
+
+        // 更新高亮元素位置
+        const highlightElement = document.getElementById('current-line-highlight');
+        if (highlightElement) {
+            highlightElement.style.transform = `translateY(-${editor.scrollTop}px)`;
         }
     });
 
@@ -638,25 +724,94 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('export-md-btn').addEventListener('click', exportMarkdown);
     document.getElementById('export-pdf-btn').addEventListener('click', exportPDF);
 
-    // 主题切换功能
-    document.getElementById('theme-btn').addEventListener('click', function() {
+    // 主题设置
+    const THEME_LIGHT = 'light';
+    const THEME_DARK = 'dark';
+    const THEME_AUTO = 'auto';
+    let currentTheme = THEME_LIGHT;
+
+    // 检测系统主题偏好
+    function detectSystemTheme() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ?
+            THEME_DARK : THEME_LIGHT;
+    }
+
+    // 应用主题
+    function applyTheme(theme) {
         const body = document.body;
         const themeBtn = document.getElementById('theme-btn');
         const codeTheme = document.getElementById('code-theme');
 
-        if (body.classList.contains('light-theme')) {
+        // 如果是自动主题，则根据系统偏好设置
+        if (theme === THEME_AUTO) {
+            theme = detectSystemTheme();
+        }
+
+        // 应用主题
+        if (theme === THEME_DARK) {
             body.classList.remove('light-theme');
             body.classList.add('dark-theme');
             themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
             codeTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css';
-            localStorage.setItem('markdown-editor-theme', 'dark');
         } else {
             body.classList.remove('dark-theme');
             body.classList.add('light-theme');
             themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
             codeTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css';
-            localStorage.setItem('markdown-editor-theme', 'light');
         }
+
+        // 更新当前行高亮
+        updateLineNumbers();
+    }
+
+    // 监听系统主题变化
+    function setupSystemThemeListener() {
+        if (window.matchMedia) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+            // 添加主题变化监听器
+            try {
+                // Chrome & Firefox
+                mediaQuery.addEventListener('change', (e) => {
+                    if (currentTheme === THEME_AUTO) {
+                        applyTheme(THEME_AUTO);
+                    }
+                });
+            } catch (error) {
+                try {
+                    // Safari
+                    mediaQuery.addListener((e) => {
+                        if (currentTheme === THEME_AUTO) {
+                            applyTheme(THEME_AUTO);
+                        }
+                    });
+                } catch (error2) {
+                    console.error('无法添加主题变化监听器', error2);
+                }
+            }
+        }
+    }
+
+    // 主题切换功能
+    document.getElementById('theme-btn').addEventListener('click', function() {
+        // 循环切换主题：亮色 -> 暗色 -> 自动 -> 亮色
+        if (currentTheme === THEME_LIGHT) {
+            currentTheme = THEME_DARK;
+            showNotification('已切换到暗色主题');
+        } else if (currentTheme === THEME_DARK) {
+            currentTheme = THEME_AUTO;
+            showNotification('已切换到自动主题（跟随系统）');
+            document.getElementById('theme-btn').innerHTML = '<i class="fas fa-adjust"></i>';
+        } else {
+            currentTheme = THEME_LIGHT;
+            showNotification('已切换到亮色主题');
+        }
+
+        // 应用主题
+        applyTheme(currentTheme);
+
+        // 保存主题设置
+        localStorage.setItem('markdown-editor-theme', currentTheme);
     });
 
     // 快捷键帮助对话框
@@ -848,12 +1003,23 @@ console.log('Hello, Markdown!');
 
         // 加载保存的主题
         const savedTheme = localStorage.getItem('markdown-editor-theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.remove('light-theme');
-            document.body.classList.add('dark-theme');
-            document.getElementById('theme-btn').innerHTML = '<i class="fas fa-sun"></i>';
-            document.getElementById('code-theme').href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css';
+        if (savedTheme) {
+            currentTheme = savedTheme;
+        } else {
+            // 默认使用亮色主题
+            currentTheme = THEME_LIGHT;
         }
+
+        // 应用主题
+        applyTheme(currentTheme);
+
+        // 设置主题按钮图标
+        if (currentTheme === THEME_AUTO) {
+            document.getElementById('theme-btn').innerHTML = '<i class="fas fa-adjust"></i>';
+        }
+
+        // 设置系统主题变化监听器
+        setupSystemThemeListener();
 
         // 加载自动保存设置
         const savedAutoSave = localStorage.getItem('markdown-editor-autosave');

@@ -35,7 +35,7 @@ body.dark-theme {
 
 .toolbar {
     display: flex;
-    padding: 10px;
+    padding: 12px;
     background-color: #f0f0f0;
     border-bottom: 1px solid #ddd;
     transition: background-color 0.3s;
@@ -48,13 +48,14 @@ body.dark-theme .toolbar {
 }
 
 .toolbar button {
-    margin-right: 5px;
-    padding: 5px 10px;
+    margin-right: 6px;
+    padding: 6px 12px;
     background-color: #fff;
     border: 1px solid #ddd;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
+    font-size: 1rem;
 }
 
 body.dark-theme .toolbar button {
@@ -145,63 +146,84 @@ body.dark-theme .dropdown-content button:hover {
 }
 
 .editor {
-    background: #f8f9fa;
     position: relative;
+    flex: 1;
     display: flex;
-    padding: 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #fff;
 }
 
 body.dark-theme .editor {
-    background: #252526;
+    background-color: #252526;
+    border-color: #444;
 }
 
 /* 行号样式 */
 .line-numbers {
-    width: 40px;
-    padding: 20px 0;
-    background-color: #f0f0f0;
-    color: #999;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
+    width: 50px;
+    padding: 10px 8px;
+    background-color: #f5f5f5;
+    color: #666;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
     line-height: 1.6;
     text-align: right;
-    user-select: none;
-    overflow: hidden;
     border-right: 1px solid #ddd;
+    user-select: none;
+    overflow-y: hidden;
+    position: relative;
+    height: 100%; /* 确保高度填满编辑器 */
 }
 
 body.dark-theme .line-numbers {
     background-color: #1e1e1e;
-    color: #666;
+    color: #999;
     border-right: 1px solid #444;
 }
 
 .line-numbers div {
     padding: 0 5px;
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap; /* 防止行号换行 */
 }
 
-.line-numbers .active-line {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: #333;
+/* 当前行高亮 */
+.active-line {
+    background-color: #e6f7ff;
+    color: #1890ff;
+    font-weight: bold;
+    border-radius: 3px;
 }
 
-body.dark-theme .line-numbers .active-line {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #ccc;
+/* 暗色主题下的当前行高亮 */
+.dark-theme .active-line {
+    background-color: #1a3e59;
+    color: #61dafb;
+    border-radius: 3px;
 }
 
+/* 编辑器文本区域 */
 .editor textarea {
-    width: calc(100% - 40px);
+    width: calc(100% - 50px);
     height: 100%;
+    padding: 10px;
     border: none;
-    background: transparent;
     resize: none;
-    outline: none;
-    font-family: 'LXGW WenKai', 'Courier New', Courier, monospace;
-    font-size: 14px;
+    font-family: 'LXGW WenKai', 'Courier New', monospace;
+    font-size: 16px;
     line-height: 1.6;
-    color: inherit;
-    padding: 20px;
+    color: #333;
+    background-color: transparent;
+    position: relative;
+    z-index: 1;
+    transition: background-image 0.3s, color 0.3s;
+}
+
+/* 暗色主题下的编辑器文本 */
+body.dark-theme .editor textarea {
+    color: #e0e0e0;
 }
 
 /* 高亮当前行 */
@@ -211,10 +233,10 @@ body.dark-theme .line-numbers .active-line {
 
 .status-bar {
     display: flex;
-    padding: 5px 10px;
+    padding: 8px 12px;
     background-color: #f0f0f0;
     border-top: 1px solid #ddd;
-    font-size: 12px;
+    font-size: 14px;
     color: #666;
     transition: background-color 0.3s;
     z-index: 10;
@@ -251,7 +273,7 @@ body.dark-theme .status-bar {
     background: white;
     border-left: 1px solid #ddd;
     font-family: 'LXGW WenKai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    line-height: 1.5;
+    line-height: 1.6;
     color: #24292e;
     font-size: 16px;
     padding: 32px;
@@ -265,30 +287,30 @@ body.dark-theme .preview {
 
 /* 预览区域的样式 */
 .preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 {
-    margin-top: 24px;
-    margin-bottom: 16px;
+    margin-top: 28px;
+    margin-bottom: 18px;
     font-weight: 600;
     line-height: 1.25;
 }
 
 .preview h1 {
-    font-size: 2em;
+    font-size: 2.2em;
     padding-bottom: 0.3em;
     border-bottom: 1px solid #eaecef;
 }
 
 .preview h2 {
-    font-size: 1.5em;
+    font-size: 1.7em;
     padding-bottom: 0.3em;
     border-bottom: 1px solid #eaecef;
 }
 
 .preview h3 {
-    font-size: 1.25em;
+    font-size: 1.4em;
 }
 
 .preview h4 {
-    font-size: 1em;
+    font-size: 1.2em;
 }
 
 .preview h5 {
@@ -306,7 +328,8 @@ body.dark-theme .preview h6 {
 
 .preview p {
     margin-top: 0;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
+    line-height: 1.6;
 }
 
 .preview a {
@@ -670,4 +693,36 @@ body.dark-theme .preview::-webkit-scrollbar-thumb:hover {
 .editor, .preview, .line-numbers {
     will-change: transform;
     transform: translateZ(0);
+}
+
+/* 删除不再需要的样式 */
+.editor-active-line {
+    display: none;
+}
+
+.dark-theme .editor-active-line {
+    display: none;
+}
+
+/* 当前行高亮元素 */
+#current-line-highlight {
+    position: absolute;
+    left: 50px;
+    right: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+body.light-theme #current-line-highlight {
+    background-color: rgba(232, 244, 253, 0.9);
+}
+
+body.dark-theme #current-line-highlight {
+    background-color: rgba(55, 100, 140, 0.9);
+}
+
+/* 整体放大20% */
+html {
+    font-size: 120%;
 }
