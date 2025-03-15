@@ -52,7 +52,7 @@
 
 1. 克隆仓库到本地：
    ```bash
-   git clone https://github.com/yourusername/markdown-editor.git
+   git clone https://github.com/pengchangg/markdown-editor.git
    cd markdown-editor
    ```
 

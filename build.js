@@ -14,7 +14,7 @@ const config = {
   fontsDir: 'fonts', // 字体目录
   imgDirs: ['images', 'img', 'assets'], // 可能的图片目录
   htmlFiles: ['index.html', 'export-test.html'], // HTML文件
-  mdFiles: ['*.md'], // Markdown文件
+  mdFiles: ['README.md', 'README.en.md',"CHANGELOG.md","CHANGELOG.en.md"], // Markdown文件
   excludeDirs: ['node_modules', '.git', 'dist'] // 排除的目录
 };
 

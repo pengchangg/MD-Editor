@@ -51,7 +51,7 @@ For detailed information about all updates, please check the [Changelog](CHANGEL
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/markdown-editor.git
+   git clone https://github.com/pengchangg/markdown-editor.git
    cd markdown-editor
    ```
 
