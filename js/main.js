@@ -125,6 +125,8 @@ function initAppConfig() {
     
     // 全局配置对象
     window.AppConfig = {
+        // 编译打包的时候自动提取当前 tag 作为版本号,默认使用devper
+        version: 'devper', 
         isMac,
         modKey,
         altKey,
@@ -133,7 +135,7 @@ function initAppConfig() {
         PERFORMANCE_SAMPLE_RATE: 0.1 // 性能采样率
     };
     
-    console.log('应用配置初始化完成');
+    console.log('应用配置初始化完成, version:', window.AppConfig.version);
 }
 
 // 缓存DOM元素

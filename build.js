@@ -4,6 +4,7 @@ const { minify } = require('terser');
 const CleanCSS = require('clean-css');
 const glob = require('glob');
 const cheerio = require('cheerio');
+const exec = require('child_process').exec;
 
 // 配置
 const config = {
@@ -369,11 +370,38 @@ function createReadme() {
   console.log('创建README文件完成');
 }
 
+async function injectVersion() {
+  // 获取当前 tag
+  const version = await new Promise((resolve, reject) => {
+    exec('git tag --points-at HEAD', (error, stdout, stderr) => {
+      if (error) {
+        console.error(`执行git命令出错: ${error}`);
+        resolve(''); // 出错时使用空字符串作为版本
+        return;
+      }
+      
+      const version = stdout.trim();
+      console.log(`当前 tag: ${version}`);
+      
+      resolve(version);
+    });
+  });
+  console.log(`当前 tag: ${version}`);
+  // 替换 main.js 中的版本号
+  const mainJsPath = path.join(config.srcDir, config.jsDir, 'main.js');
+  const mainJsContent = fs.readFileSync(mainJsPath, 'utf8');
+  const updatedMainJsContent = mainJsContent.replace(/version: 'devper'/g, `version: '${version}'`);
+  fs.writeFileSync(mainJsPath, updatedMainJsContent);
+}
+
 // 主函数
 async function build() {
   console.log('开始构建...');
   
   try {
+    // 注入版本号
+    await injectVersion();
+
     // 压缩JS文件
     await minifyJS();
     
