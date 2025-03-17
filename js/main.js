@@ -1,19 +1,19 @@
 // 主入口文件 - 负责初始化和协调各模块
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Markdown编辑器初始化中...');
-    
+
     // 初始化应用配置 - 确保最先初始化
     initAppConfig();
-    
+
     // 缓存DOM元素
     cacheElements();
-    
+
     // 初始化主题
     initTheme();
-    
+
     // 初始化分割视图
     initSplitView();
-    
+
     // 初始化各个模块
     Editor.init();
     HistoryModule.init();
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ModalModule.init();
     PerformanceModule.init();
     Storage.init();
-    
+
     // 确保ExportModule正确初始化
     if (typeof ExportModule !== 'undefined' && ExportModule.init) {
         console.log('初始化ExportModule');
@@ -33,13 +33,13 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error('ExportModule未定义或缺少init方法');
     }
-    
+
     // 初始化语言模块 - 确保在所有UI元素加载完成后初始化
     setTimeout(() => {
         if (typeof LanguageModule !== 'undefined' && LanguageModule.init) {
             console.log('初始化LanguageModule');
             LanguageModule.init();
-            
+
             // 在语言模块初始化后加载初始内容
             loadInitialContent();
         } else {
@@ -53,13 +53,13 @@ document.addEventListener('DOMContentLoaded', function() {
     Editor.updatePreview();
     LineNumbersModule.updateLineNumbers();
     TitleManager.updateDocumentTitle();
-    
+
     // 确保光标位置信息正确显示
     Editor.updateCursorPosition();
-    
+
     // 添加初始状态到历史记录
     HistoryModule.addState(editor.value);
-    
+
     // 显示快捷键模式提示
     // setTimeout(() => {
     //     UIUtils.showNotification(`当前使用${AppConfig.isMac ? 'macOS' : 'Windows/Linux'}快捷键模式: ${AppConfig.modKey}键作为修饰键`, 5000);
@@ -109,7 +109,7 @@ console.log('Hello, Markdown!');
 [点击访问](https://www.example.com)
 `;
         }
-        
+
         // 更新预览和行号
         Editor.updatePreview();
         LineNumbersModule.updateLineNumbers();
@@ -122,19 +122,19 @@ function initAppConfig() {
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     const modKey = isMac ? '⌘' : 'Ctrl'; // 修饰键：Mac用⌘，其他用Ctrl
     const altKey = isMac ? '⌥' : 'Alt';  // 辅助键：Mac用⌥，其他用Alt
-    
+
     // 全局配置对象
     window.AppConfig = {
         // 编译打包的时候自动提取当前 tag 作为版本号,默认使用devper
-        version: 'devper', 
+        version: 'devper',
         isMac,
         modKey,
         altKey,
-        AUTO_SAVE_DELAY: 30000, // 自动保存延迟（毫秒）
+        AUTO_SAVE_DELAY: 5000, // 自动保存延迟（毫秒）
         MAX_HISTORY_STATES: 100, // 最大历史记录数
         PERFORMANCE_SAMPLE_RATE: 0.1 // 性能采样率
     };
-    
+
     console.log('应用配置初始化完成, version:', window.AppConfig.version);
 }
 
@@ -167,7 +167,7 @@ function cacheElements() {
         redoBtn,
         autosaveBtn
     };
-    
+
     console.log('DOM元素缓存完成');
 }
 
@@ -178,14 +178,14 @@ function initTheme() {
     if (savedTheme === 'dark') {
         document.body.classList.remove('light-theme');
         document.body.classList.add('dark-theme');
-        
+
         // 更新代码高亮主题
         const codeTheme = document.getElementById('code-theme');
         if (codeTheme) {
             codeTheme.href = codeTheme.href.replace('github.min.css', 'github-dark.min.css');
         }
     }
-    
+
     console.log('主题初始化完成');
 }
 
@@ -203,4 +203,4 @@ function initSplitView() {
     } catch (error) {
         console.error('分割视图初始化失败:', error);
     }
-} 
+}

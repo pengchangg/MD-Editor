@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 更新按钮状态
             this.updateButtons();
-            
+
             // 调试信息
             console.log(`历史记录: 添加状态 #${this.currentIndex}, 总状态数: ${this.states.length}`);
         },
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateEditorStatus();
                 updateLineNumbers();
                 this.updateButtons();
-                
+
                 // 调试信息
                 console.log(`历史记录: 撤销到状态 #${this.currentIndex}`);
             }
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateEditorStatus();
                 updateLineNumbers();
                 this.updateButtons();
-                
+
                 // 调试信息
                 console.log(`历史记录: 重做到状态 #${this.currentIndex}`);
             }
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
             undoBtn.disabled = this.currentIndex <= 0;
             redoBtn.disabled = this.currentIndex >= this.states.length - 1;
         },
-        
+
         // 清空历史记录
         clear: function() {
             this.states = [];
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 自动保存功能
     let autoSaveInterval = null;
     let autoSaveEnabled = false;
-    const AUTO_SAVE_DELAY = 30000; // 30秒
+    const AUTO_SAVE_DELAY = 5000; // 5秒
 
     // 滚动同步变量
     let isEditorScrolling = false;
@@ -400,10 +400,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateDocumentTitle() {
         // 查找编辑器中的第一个标题
         const text = editor.value;
-        
+
         // 优化：只检查文本的前200个字符，通常标题都在文档开头
         const startText = text.substring(0, 200);
-        
+
         // 检查缓存，如果前200个字符没有变化，直接使用缓存的标题
         if (startText === titleCache.text) {
             // 只有当标题发生变化时才更新
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return;
         }
-        
+
         // 支持多种标题格式：
         // 1. # 标题格式
         // 2. 标题
@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 3. 标题
         //    -----
         let titleText = null;
-        
+
         // 尝试匹配 # 格式标题 (优化正则表达式)
         const hashTitleMatch = startText.match(/^(#{1,6})\s+([^\n]+)/m);
         if (hashTitleMatch && hashTitleMatch[2]) {
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-        
+
         // 设置网站标题
         let newTitle = 'MarkDown 编辑器';
         if (titleText) {
@@ -446,15 +446,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (titleText.length > 50) {
                 titleText = titleText.substring(0, 47) + '...';
             }
-            
+
             // 生成新标题
             newTitle = `${titleText} - MarkDown 编辑器`;
         }
-        
+
         // 更新缓存
         titleCache.text = startText;
         titleCache.title = newTitle;
-        
+
         // 只有当标题发生变化时才更新
         if (document.title !== newTitle) {
             document.title = newTitle;
@@ -755,16 +755,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function exportPDF() {
         // 显示加载指示器
         showNotification('正在生成PDF，请稍候...', 0);
-        
+
         // 创建一个新的预览区域用于PDF导出
         const pdfPreview = document.createElement('div');
         pdfPreview.className = 'markdown-body pdf-export';
         pdfPreview.innerHTML = preview.innerHTML;
-        
+
         // 获取当前代码高亮主题
         const codeTheme = document.getElementById('code-theme').href;
         const isLightTheme = document.body.classList.contains('light-theme');
-        
+
         // 添加GitHub风格的样式
         const style = document.createElement('style');
         style.textContent = `
@@ -857,7 +857,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 border: 0;
             }
             /* 确保分页时标题不会被分割 */
-            .pdf-export h1, .pdf-export h2, .pdf-export h3, 
+            .pdf-export h1, .pdf-export h2, .pdf-export h3,
             .pdf-export h4, .pdf-export h5, .pdf-export h6 {
                 page-break-after: avoid;
                 page-break-inside: avoid;
@@ -867,16 +867,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 widows: 3;
             }
         `;
-        
+
         // 添加代码高亮链接
         const highlightLink = document.createElement('link');
         highlightLink.rel = 'stylesheet';
         highlightLink.href = codeTheme;
         document.head.appendChild(highlightLink);
-        
+
         document.body.appendChild(style);
         document.body.appendChild(pdfPreview);
-        
+
         // 确保代码高亮应用到所有代码块
         pdfPreview.querySelectorAll('pre code').forEach(block => {
             hljs.highlightElement(block);
@@ -887,14 +887,14 @@ document.addEventListener('DOMContentLoaded', function() {
             margin: [15, 15, 15, 15],
             filename: 'markdown-document.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
+            html2canvas: {
                 scale: 2,
                 useCORS: true,
                 logging: false
             },
-            jsPDF: { 
-                unit: 'mm', 
-                format: 'a4', 
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
                 orientation: 'portrait',
                 compress: true
             }
@@ -1093,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateShortcutTable() {
         // 清空表格
         shortcutTable.innerHTML = '';
-        
+
         // 定义快捷键列表
         const shortcuts = [
             { key: `${modKey}+B`, action: '粗体' },
@@ -1114,16 +1114,16 @@ document.addEventListener('DOMContentLoaded', function() {
             { key: `${modKey}+Z`, action: '撤销' },
             { key: `${modKey}+Y 或 ${modKey}+Shift+Z`, action: '重做' }
         ];
-        
+
         // 添加到表格
         shortcuts.forEach(shortcut => {
             const row = document.createElement('tr');
             const keyCell = document.createElement('td');
             const actionCell = document.createElement('td');
-            
+
             keyCell.textContent = shortcut.key;
             actionCell.textContent = shortcut.action;
-            
+
             row.appendChild(keyCell);
             row.appendChild(actionCell);
             shortcutTable.appendChild(row);
@@ -1275,9 +1275,11 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDocumentTitle = measurePerformance(originalUpdateDocumentTitle, 'titleUpdateTime');
 
     // 每分钟记录一次性能报告
-    setInterval(() => {
-        performanceMetrics.logReport();
-    }, 60000);
+    if(window.AppConfig.version === 'devper'){
+        setInterval(() => {
+            performanceMetrics.logReport();
+        }, 60000);
+    }
 
     // 添加调试功能
     function debugHistory() {
@@ -1288,7 +1290,7 @@ document.addEventListener('DOMContentLoaded', function() {
             canRedo: history.currentIndex < history.states.length - 1
         });
     }
-    
+
     // 定期检查历史记录状态
     // setInterval(debugHistory, 5000);
 
@@ -1296,7 +1298,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function init() {
         // 清空历史记录
         history.clear();
-        
+
         // 加载保存的内容
         const savedContent = localStorage.getItem('markdown-editor-content');
         if (savedContent) {
@@ -1367,10 +1369,10 @@ console.log('Hello, Markdown!');
         updatePreview();
         updateEditorStatus();
         updateLineNumbers();
-        
+
         // 更新网站标题
         debouncedUpdateDocumentTitle();
-        
+
         // 初始化历史记录 - 添加初始状态
         history.addState(editor.value);
         console.log('历史记录已初始化');
@@ -1381,7 +1383,7 @@ console.log('Hello, Markdown!');
 
         // 添加滚动同步开关按钮
         addScrollSyncButton();
-        
+
         // 显示快捷键模式提示
         // setTimeout(() => {
         //     showNotification(`当前使用${isMac ? 'macOS' : 'Windows/Linux'}快捷键模式: ${modKey}键作为修饰键`, 5000);
@@ -1392,7 +1394,7 @@ console.log('Hello, Markdown!');
     document.addEventListener('keydown', function(e) {
         // 如果编辑器获得焦点，处理特定的快捷键
         const isEditorFocused = document.activeElement === editor;
-        
+
         // 检测修饰键是否按下（Mac用metaKey，其他用ctrlKey）
         const isModKeyPressed = isMac ? e.metaKey : e.ctrlKey;
 

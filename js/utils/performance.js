@@ -7,15 +7,17 @@ const PerformanceModule = {
         lineNumberUpdateTime: [],
         titleUpdateTime: []
     },
-    
+
     // 初始化性能监控模块
     init: function() {
-        // 每分钟记录一次性能报告
-        setInterval(() => {
-            this.logReport();
-        }, 60000);
+        if(window.AppConfig.version === 'devper'){
+            // 每分钟记录一次性能报告
+            setInterval(() => {
+                this.logReport();
+            }, 60000);
+        }
     },
-    
+
     // 记录性能指标
     recordMetric: function(category, time) {
         if (this.metrics[category]) {
@@ -26,14 +28,14 @@ const PerformanceModule = {
             }
         }
     },
-    
+
     // 获取平均值
     getAverage: function(category) {
         if (!this.metrics[category] || this.metrics[category].length === 0) return 0;
         const sum = this.metrics[category].reduce((a, b) => a + b, 0);
         return sum / this.metrics[category].length;
     },
-    
+
     // 获取性能报告
     getReport: function() {
         return {
@@ -43,9 +45,9 @@ const PerformanceModule = {
             averageTitleUpdateTime: this.getAverage('titleUpdateTime').toFixed(2) + 'ms'
         };
     },
-    
+
     // 记录到控制台
     logReport: function() {
         console.log('性能报告:', this.getReport());
     }
-}; 
+};

@@ -96,6 +96,13 @@
     border-left: 1px solid var(--border-color);
 }
 
+.preview .local-image {
+    display: block;
+    margin: 0 auto;
+    width: 43%;
+    border-radius: 10px;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
     .line-numbers {
@@ -103,13 +110,13 @@
         padding: 10px 5px;
         font-size: 0.9rem;
     }
-    
+
     #editor {
         padding: 10px;
         font-size: 0.9rem;
     }
-    
+
     .current-line-highlight {
         left: 40px;
     }
-} 
+}
