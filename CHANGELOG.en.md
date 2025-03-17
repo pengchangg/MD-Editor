@@ -2,6 +2,13 @@
 
 This document records all significant changes to the Markdown Editor.
 
+## [v1.2.6] - 2025-03-17
+
+### Fixes
+- Updated editor styles to support center-aligned local images,
+- Adjusted auto-save delay to 5 seconds,
+- Optimized log recording functionality in the performance monitoring module.
+
 ## [v1.2.2] - 2025-03-15
 
 ### Fixes
@@ -66,4 +73,4 @@ This document records all significant changes to the Markdown Editor.
 - Added keyboard shortcut help dialog, optimized styles and performance
 - Fixed style issues during theme switching
 - Added custom font LXGW WenKai, optimized loading performance
-- Added basic functionality of the Markdown editor 
+- Added basic functionality of the Markdown editor
