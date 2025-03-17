@@ -1,0 +1,24 @@
+{
+  "name": "md-editor-vanilla",
+  "version": "1.0.0",
+  "description": "Markdown编辑器资源处理工具",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
+    "fs-extra": "^11.1.1",
+    "terser": "^5.24.0",
+    "clean-css": "^5.3.2",
+    "fontmin": "^0.9.9",
+    "glob": "^10.3.10",
+    "url-parse": "^1.5.10",
+    "imagemin": "^8.0.1",
+    "imagemin-jpegtran": "^7.0.0",
+    "imagemin-optipng": "^8.0.0",
+    "imagemin-gifsicle": "^7.0.0",
+    "imagemin-svgo": "^10.0.1"
+  }
+} 

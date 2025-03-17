@@ -1,0 +1,172 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 本应用不依赖第三方 Cookie，仅使用 localStorage 进行本地存储 -->
+    <title>MarkDown 编辑器</title>
+    <!-- 引入文泉驿字体 预加载字体 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@callmebill/lxgw-wenkai-web@latest/style.css" as="style">
+    <!-- 引入 Split.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
+    <!-- 引入 marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+    <!-- 引入 highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" id="code-theme">
+    <!-- 引入图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 html2canvas.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- 引入 jsPDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- 保留 html2pdf.js 作为备用 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- 引入自定义样式 -->
+    <link rel="stylesheet" href="css/main.css">
+    <!-- 添加调试信息 -->
+    <script>
+        // 检查必要的库是否正确加载
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('html2pdf库状态:', typeof html2pdf === 'function' ? '已加载' : '未加载');
+            console.log('html2canvas库状态:', typeof html2canvas === 'function' ? '已加载' : '未加载');
+            console.log('jsPDF库状态:', typeof jspdf !== 'undefined' ? '已加载' : '未加载');
+        });
+    </script>
+</head>
+<body class="light-theme">
+    <div class="toolbar">
+        <button id="bold-btn" title="粗体"><i class="fas fa-bold"></i></button>
+        <button id="italic-btn" title="斜体"><i class="fas fa-italic"></i></button>
+        <button id="heading-btn" title="标题"><i class="fas fa-heading"></i></button>
+        <button id="link-btn" title="链接"><i class="fas fa-link"></i></button>
+        <button id="image-btn" title="图片"><i class="fas fa-image"></i></button>
+        <button id="list-btn" title="无序列表"><i class="fas fa-list-ul"></i></button>
+        <button id="ordered-list-btn" title="有序列表"><i class="fas fa-list-ol"></i></button>
+        <button id="quote-btn" title="引用"><i class="fas fa-quote-right"></i></button>
+        <button id="code-btn" title="代码块"><i class="fas fa-code"></i></button>
+        <button id="table-btn" title="表格"><i class="fas fa-table"></i></button>
+        <div class="spacer"></div>
+        <button id="help-btn" title="快捷键帮助"><i class="fas fa-keyboard"></i></button>
+        <button id="undo-btn" title="撤销 (Ctrl+Z)"><i class="fas fa-undo"></i></button>
+        <button id="redo-btn" title="重做 (Ctrl+Y)"><i class="fas fa-redo"></i></button>
+        <div class="dropdown">
+            <button id="export-btn" title="导出"><i class="fas fa-file-export"></i> 导出</button>
+            <div class="dropdown-content">
+                <button id="export-md-btn"><i class="fas fa-file-alt"></i> Markdown (.md)</button>
+                <button id="export-pdf-btn"><i class="fas fa-file-pdf"></i> PDF (.pdf)</button>
+            </div>
+        </div>
+        <button id="save-btn" title="保存 (Ctrl+S)"><i class="fas fa-save"></i></button>
+        <button id="autosave-btn" title="自动保存"><i class="fas fa-clock"></i></button>
+        <button id="language-btn" title="切换语言"><i class="fas fa-language"></i></button>
+        <button id="theme-btn" title="切换主题"><i class="fas fa-moon"></i></button>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="editor-container">
+                <div class="line-numbers" id="line-numbers"></div>
+                <textarea id="editor" placeholder="请输入 Markdown 文本..."></textarea>
+            </div>
+            <div class="preview" id="preview"></div>
+        </div>
+        <div class="status-bar">
+            <div class="status-bar-item editor-status"><i class="fas fa-info-circle"></i>字符数: <span id="char-count">0</span></div>
+            <div class="status-bar-item cursor-position"><i class="fas fa-map-marker-alt"></i>行: <span id="line-pos">1</span>, 列: <span id="col-pos">0</span></div>
+            <div class="status-bar-item save-message"><i class="fas fa-save"></i><span id="save-status">已保存</span></div>
+            <div class="status-bar-item autosave-status"><i class="fas fa-clock"></i>自动保存: <span id="autosave-status">关闭</span></div>
+            <div class="status-bar-item storage-info">
+                <i class="fas fa-database"></i>占用空间: <span id="storage-size">0 KB</span>
+                <button id="cleanup-images-btn" data-tooltip="清理未使用的图片" class="icon-button"><i class="fas fa-broom"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <!-- 快捷键帮助对话框 -->
+    <div id="shortcut-help" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Markdown 编辑器快捷键</h2>
+            <table id="shortcut-table">
+                <thead>
+                    <tr>
+                        <th>快捷键</th>
+                        <th>功能</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 快捷键内容将由JavaScript动态生成 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 本地图片上传对话框 -->
+    <div id="image-upload-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>插入本地图片</h2>
+            <div class="upload-container">
+                <input type="file" id="image-file" accept="image/*">
+                <button id="upload-image-btn">插入图片</button>
+            </div>
+            <div class="image-preview-container">
+                <p>预览:</p>
+                <div id="image-preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导出预览对话框 -->
+    <div id="export-preview-modal" class="modal">
+        <div class="modal-content export-preview-content">
+            <span class="close">×</span>
+            <div class="export-preview-header">
+                <h2>导出预览</h2>
+                <div class="export-actions">
+                    <div class="export-filename">
+                        <label for="export-filename">文件名:</label>
+                        <input type="text" id="export-filename" placeholder="document">
+                        <span id="export-extension">.md</span>
+                    </div>
+                    <button id="confirm-export-btn" class="primary-btn"><i class="fas fa-download"></i> 确认导出</button>
+                    <button id="cancel-export-btn" class="secondary-btn"><i class="fas fa-times"></i> 取消</button>
+                </div>
+            </div>
+            <div class="export-preview-container">
+                <div id="export-preview-content"></div>
+            </div>
+            <!-- 添加调试信息 -->
+            <div class="export-debug-info" style="margin-top: 10px; font-size: 0.8em; color: #888;">
+                <div>导出模块状态: <span id="export-module-status">检查中...</span></div>
+                <div>html2pdf状态: <span id="html2pdf-status">检查中...</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入工具函数模块 -->
+    <script src="js/utils/utils.js"></script>
+    <script src="js/utils/performance.js"></script>
+    <script src="js/utils/storage.js"></script>
+    <script src="js/utils/export.js"></script>
+    
+    <!-- 引入编辑器模块 -->
+    <script src="js/editor/editor.js"></script>
+    <script src="js/editor/history.js"></script>
+    <script src="js/editor/line-numbers.js"></script>
+    <script src="js/editor/title-manager.js"></script>
+    
+    <!-- 引入UI模块 -->
+    <script src="js/ui/toolbar.js"></script>
+    <script src="js/ui/theme.js"></script>
+    <script src="js/ui/shortcuts.js"></script>
+    <script src="js/ui/modal.js"></script>
+    <script src="js/ui/image-handler.js"></script>
+    <script src="js/ui/language.js"></script>
+    
+    <!-- 引入主入口文件 -->
+    <script src="js/main.js"></script>
+
+
+</body></html>

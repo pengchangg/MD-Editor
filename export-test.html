@@ -1,0 +1,198 @@
+<!DOCTYPE html><html lang="zh"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF导出测试页面</title>
+    <!-- 引入 html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1, h2, h3 {
+            color: #333;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        pre {
+            background-color: #f6f8fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        code {
+            font-family: monospace;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        blockquote {
+            border-left: 4px solid #ddd;
+            padding-left: 15px;
+            color: #666;
+            margin: 15px 0;
+        }
+        
+        #content {
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF导出测试页面</h1>
+    
+    <div class="controls">
+        <h2>测试控制</h2>
+        <p>点击下面的按钮测试PDF导出功能：</p>
+        <button id="export-basic">基本导出</button>
+        <button id="export-custom">自定义选项导出</button>
+    </div>
+    
+    <div id="content">
+        <h2>Markdown内容示例</h2>
+        
+        <h3>1. 标题和段落</h3>
+        <p>这是一个普通段落，包含<strong>粗体文本</strong>和<em>斜体文本</em>。</p>
+        
+        <h3>2. 列表</h3>
+        <h4>无序列表</h4>
+        <ul>
+            <li>项目1</li>
+            <li>项目2
+                <ul>
+                    <li>子项目A</li>
+                    <li>子项目B</li>
+                </ul>
+            </li>
+            <li>项目3</li>
+        </ul>
+        
+        <h4>有序列表</h4>
+        <ol>
+            <li>第一项</li>
+            <li>第二项
+                <ol>
+                    <li>子项目1</li>
+                    <li>子项目2</li>
+                </ol>
+            </li>
+            <li>第三项</li>
+        </ol>
+        
+        <h3>3. 引用</h3>
+        <blockquote>
+            <p>这是一个引用示例。</p>
+            <p>引用可以包含多个段落。</p>
+        </blockquote>
+        
+        <h3>4. 代码</h3>
+        <p>行内代码：<code>console.log('Hello World');</code></p>
+        
+        <p>代码块：</p>
+        <pre><code>function sayHello() {
+  console.log('Hello, Markdown!');
+  return true;
+}
+
+// 这是一个注释
+const result = sayHello();</code></pre>
+        
+        <h3>5. 表格</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>年龄</th>
+                    <th>职业</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>张三</td>
+                    <td>25</td>
+                    <td>工程师</td>
+                </tr>
+                <tr>
+                    <td>李四</td>
+                    <td>30</td>
+                    <td>设计师</td>
+                </tr>
+                <tr>
+                    <td>王五</td>
+                    <td>28</td>
+                    <td>产品经理</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查html2pdf是否加载
+            console.log('html2pdf库状态:', typeof html2pdf === 'function' ? '已加载' : '未加载');
+            
+            // 基本导出按钮
+            document.getElementById('export-basic').addEventListener('click', function() {
+                const element = document.getElementById('content');
+                html2pdf(element);
+            });
+            
+            // 自定义选项导出按钮
+            document.getElementById('export-custom').addEventListener('click', function() {
+                const element = document.getElementById('content');
+                
+                const options = {
+                    margin: 10,
+                    filename: 'test-export.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                html2pdf().from(element).set(options).save();
+            });
+        });
+    </script>
+
+ </body></html>
