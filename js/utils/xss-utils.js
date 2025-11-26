@@ -127,15 +127,29 @@ const XSSUtils = {
             content = String(content || '');
         }
         
-        // 创建临时DOM元素来处理内容
-        const tempDiv = document.createElement('div');
-        tempDiv.textContent = content; // 首先使用textContent防止直接注入
-        
-        // 获取转义后的内容
-        const escapedContent = tempDiv.innerHTML;
+        // 过滤危险内容，但保持HTML标签结构
+        const sanitizedContent = this.sanitizeHtml(content);
         
         // 设置内容
-        element.innerHTML = escapedContent;
+        element.innerHTML = sanitizedContent;
+    },
+
+    /**
+     * 简单的HTML内容过滤，移除危险标签和属性
+     * @param {string} html - HTML内容
+     * @returns {string} 过滤后的HTML内容
+     */
+    sanitizeHtml: function(html) {
+        // 移除潜在的危险标签和属性
+        return html
+            // 移除script标签
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+            // 移除on*事件处理器
+            .replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '')
+            // 移除javascript:、vbscript:等危险协议
+            .replace(/(javascript:|vbscript:|data:text\/html)/gi, '')
+            // 移除表达式（CSS）
+            .replace(/expression\s*\(/gi, '');
     },
 
     /**
