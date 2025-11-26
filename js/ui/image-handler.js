@@ -462,17 +462,28 @@ const ImageHandler = (function() {
                         const title = titleMatch ? ` title="${String(titleMatch[1])}"` : '';
                         const className = ' class="local-image"';
                         
-                        // 确保图片数据是字符串
-                        const imageData = String(uploadedImages[imageId].data || '');
+                        // 确保图片数据是字符串并进行安全验证
+                        let imageData = String(uploadedImages[imageId].data || '');
                         if (!imageData) {
                             console.warn(`图片 ${imageId} 的数据为空`);
                             return `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Cpath fill='%23d9534f' d='M30 30 L70 70 M70 30 L30 70'/%3E%3C/svg%3E" alt="图片数据为空" class="local-image error">`;
                         }
                         
+                        // 验证图片数据是否为安全的data URI
+                        if (!imageData.startsWith('data:image/')) {
+                            console.warn(`图片 ${imageId} 的数据不是有效的图片data URI`);
+                            return `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Cpath fill='%23d9534f' d='M30 30 L70 70 M70 30 L30 70'/%3E%3C/svg%3E" alt="图片数据无效" class="local-image error">`;
+                        }
+                        
                         console.debug(`成功替换图片 ${imageId}`);
                         
-                        // 返回带有实际图片数据的img标签
-                        return `<img src="${imageData}" alt="${alt}"${title}${className}>`;
+                        // 返回带有实际图片数据的img标签，使用XSS防护
+                        return XSSUtils.createSafeImageElement({
+                            src: imageData,
+                            alt: alt,
+                            title: XSSUtils.escapeHtmlAttr(String(titleMatch ? titleMatch[1] : '')),
+                            className: 'local-image'
+                        }).outerHTML;
                     } else {
                         console.warn(`找不到图片数据，ID: ${imageId}`);
                     }
